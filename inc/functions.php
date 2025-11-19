@@ -1,0 +1,49 @@
+<?php
+session_start();
+include 'config.php';
+
+function kontak_all() {
+    global $conn;
+    return mysqli_query($conn, "SELECT * FROM kontak ORDER BY id DESC");
+}
+
+function kontak_add($nama, $jenis, $email, $telepon) {
+    global $conn;
+    $stmt = $conn->prepare("INSERT INTO kontak (nama, jenis, email, telepon) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nama, $jenis, $email, $telepon);
+    return $stmt->execute();
+}
+
+function kontak_delete($id) {
+    global $conn;
+    $stmt = $conn->prepare("DELETE FROM kontak WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+function kategori_all() {
+    global $conn;
+    $sql = "SELECT * FROM kategori ORDER BY id DESC";
+    $result = mysqli_query($conn, $sql);
+
+    $data = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+    }
+    return $data;
+}
+
+function kategori_add($nama, $jenis, $ppn) {
+    global $conn;
+    $stmt = $conn->prepare("INSERT INTO kategori (nama, jenis, ppn) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $nama, $jenis, $ppn);
+    return $stmt->execute();
+}
+
+function kategori_delete($id) {
+    global $conn;
+    $id = intval($id);
+    return mysqli_query($conn, "DELETE FROM kategori WHERE id = $id");
+}
+
+?>
