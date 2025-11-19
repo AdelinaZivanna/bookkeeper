@@ -90,7 +90,7 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         <li class="nav-item">
-                            <a href="#" class="nav-link active" data-nav="#page-dashboard">
+                            <a href="views/dashboard.php" class="nav-link active" >
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Dashboard</p>
                             </a>
@@ -102,31 +102,33 @@
                                 <p> Kas & Bank<i class="right fas fa-angle-left"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
-                                <li class="nav-item"><a href="#" class="nav-link" data-nav="#page-cash"><i
+                                <li class="nav-item"><a href="transaksi_bank.php" class="nav-link"><i
                                             class="far fa-circle nav-icon"></i>
                                         <p>Transaksi Kas/Bank</p>
                                     </a></li>
-                                <li class="nav-item"><a href="#" class="nav-link" data-nav="#page-petty"><i
+                                <li class="nav-item"><a href="transaksi_kas.php" class="nav-link"><i
                                             class="far fa-circle nav-icon"></i>
                                         <p>Kas Kecil</p>
                                     </a></li>
                             </ul>
                         </li>
                         <li class="nav-header">Master</li>
-                        <li class="nav-item"><a href="#" class="nav-link" data-nav="#page-contacts"><i
-                                    class="nav-icon fas fa-address-book"></i>
+                        <li class="nav-item">
+                            <a href="<?php echo $kontak_path; ?>" class="nav-link">
+                                <i class="nav-icon fas fa-address-book"></i>
                                 <p>Kontak</p>
-                            </a></li>
-                        <li class="nav-item"><a href="#" class="nav-link" data-nav="#page-categories"><i
+                            </a>
+                        </li>
+                        <li class="nav-item"><a href="views/kategori.php" class="nav-link"><i
                                     class="nav-icon fas fa-tags"></i>
                                 <p>Kategori</p>
                             </a></li>
-                        <li class="nav-item"><a href="#" class="nav-link" data-nav="#page-accounts"><i
+                        <li class="nav-item"><a href="views/akun.php" class="nav-link"><i
                                     class="nav-icon fas fa-university"></i>
                                 <p>Akun Kas/Bank</p>
                             </a></li>
                         <li class="nav-header">Lainnya</li>
-                        <li class="nav-item"><a href="#" class="nav-link" data-nav="#page-settings"><i
+                        <li class="nav-item"><a href="views/pengaturan.php" class="nav-link"><i
                                     class="nav-icon fas fa-cog"></i>
                                 <p>Pengaturan</p>
                             </a></li>
