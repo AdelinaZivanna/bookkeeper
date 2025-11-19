@@ -114,7 +114,7 @@
                         </li>
                         <li class="nav-header">Master</li>
                         <li class="nav-item">
-                            <a href="<?php echo $kontak_path; ?>" class="nav-link">
+                            <a href="views/kontak.php" class="nav-link">
                                 <i class="nav-icon fas fa-address-book"></i>
                                 <p>Kontak</p>
                             </a>
