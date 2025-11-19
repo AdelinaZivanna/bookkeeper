@@ -1,11 +1,25 @@
-<?php require_once __DIR__ . '/inc/header.php'; ?>
+<?php
+include 'inc/config.php';
+include 'inc/functions.php';
+include 'inc/header.php';
 
-<?php require_once __DIR__ . '/views/dashboard.php'; ?>
-<?php require_once __DIR__ . '/views/transaksi_kas.php'; ?>
-<?php require_once __DIR__ . '/views/transaksi_bank.php'; ?>
-<?php require_once __DIR__ . '/views/kontak.php'; ?>
-<?php require_once __DIR__ . '/views/kategori.php'; ?>
-<?php require_once __DIR__ . '/views/akun.php'; ?>
-<?php require_once __DIR__ . '/views/pengaturan.php'; ?>
+$page = $_GET['page'] ?? 'dashboard';
 
-<?php require_once __DIR__ . '/inc/footer.php'; ?>
+$allowed = [
+    'dashboard',
+    'transaksi_kas',
+    'kas_kecil',
+    'kontak',
+    'kategori',
+    'akun',
+    'pengaturan'
+];
+
+if (in_array($page, $allowed)) {
+    include "views/$page.php";
+} else {
+    echo "<h3>Halaman tidak ditemukan</h3>";
+}
+
+include 'inc/footer.php';
+    
