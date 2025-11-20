@@ -2,15 +2,25 @@
 include 'inc/config.php';
 include 'inc/functions.php';
 
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     if ($username == 'admin' && $password == 'password') {
-        $_SESSION['user_id'] = 1;
-        header('Location: views/dashboard.php');
+        $_SESSION['loggedin'] = true;
+        
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        header("Location: views/dashboard.php");
         exit;
     } else {
         $error = 'Username atau password salah!';
