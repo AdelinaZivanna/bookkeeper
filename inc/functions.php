@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'config.php';
 
 function kontak_all() {
@@ -70,4 +71,25 @@ function akun_delete($id) {
     $stmt->bind_param("i", $id);
     return $stmt->execute();
 }
+
+function settings_get() {
+    global $conn;
+    $sql = "SELECT * FROM settings WHERE id = 1 LIMIT 1";
+    $result = mysqli_query($conn, $sql);
+    return mysqli_fetch_assoc($result);
+}
+
+function settings_update($nama, $mata_uang, $ppn, $periode) {
+    global $conn;
+
+    $stmt = $conn->prepare("
+        UPDATE settings 
+        SET nama_perusahaan = ?, mata_uang = ?, ppn_default = ?, periode_terkunci = ?
+        WHERE id = 1
+    ");
+
+    $stmt->bind_param("ssss", $nama, $mata_uang, $ppn, $periode);
+    return $stmt->execute();
+}
+
 ?>
