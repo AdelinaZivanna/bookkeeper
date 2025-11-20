@@ -1,4 +1,5 @@
 <?php
+
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -10,6 +11,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-
+$base_url = "http://localhost/bookkeeper/";  
 
 ?>
