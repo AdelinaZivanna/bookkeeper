@@ -1,4 +1,8 @@
-                    <!-- DASHBOARD -->
+<?php 
+include '../inc/header.php';
+include '../inc/sidebar.php';
+?>
+<!-- DASHBOARD -->
                     <div id="page-dashboard" class="page active">
                         <div class="row">
                             <div class="col-12 col-sm-6 col-lg-3">
@@ -75,4 +79,4 @@
                         </div>
                     </div>
                     <!-- /DASHBOARD -->
-
+<?php include '../inc/footer.php'; ?>

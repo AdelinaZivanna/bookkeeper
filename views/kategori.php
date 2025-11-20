@@ -23,6 +23,7 @@ if (isset($_GET['hapus'])) {
 }
 
 include '../inc/header.php';
+include '../inc/sidebar.php';
 ?>
 
 <div id="page-categories">

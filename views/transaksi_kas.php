@@ -1,5 +1,6 @@
 <?php 
-include 'inc/config.php';
+include '../inc/header.php';
+include '../inc/sidebar.php';
 
 // Handle POST untuk Create/Update/Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -177,3 +178,5 @@ $result = mysqli_query($conn, "SELECT * FROM kaskecil ORDER BY tanggal DESC");
     </script>
 </body>
 </html>
+
+<?php include '../inc/footer.php'; ?>

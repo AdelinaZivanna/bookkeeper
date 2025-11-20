@@ -23,6 +23,8 @@ if (isset($_GET['delete'])) {
 $kontaks = kontak_all();
 
 include '../inc/header.php';
+include '../inc/sidebar.php';
+
 ?>
 
 <div class="card card-outline card-primary shadow-sm">
