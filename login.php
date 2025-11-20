@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <style>
         body {
-            background-color: #f4f6f9;
+            background-color: #343A40;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .login-box {
             width: 360px;
-            background: #fff;
+            background: #454D55;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
