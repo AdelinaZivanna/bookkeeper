@@ -46,4 +46,29 @@ function kategori_delete($id) {
     return mysqli_query($conn, "DELETE FROM kategori WHERE id = $id");
 }
 
+function akun_all() {
+    global $conn;
+    $sql = "SELECT * FROM akun ORDER BY id DESC";
+    $result = mysqli_query($conn, $sql);
+
+    $data = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+    }
+    return $data;
+}
+
+function akun_add($nama, $jenis, $mata_uang, $saldoawal) {
+    global $conn;
+    $stmt = $conn->prepare("INSERT INTO akun (nama, jenis, mata_uang, saldoawal) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nama, $jenis, $mata_uang, $saldoawal);
+    return $stmt->execute();
+}
+
+function akun_delete($id) {
+    global $conn;
+    $stmt = $conn->prepare("DELETE FROM akun WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
 ?>
