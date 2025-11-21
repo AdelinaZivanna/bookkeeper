@@ -1,11 +1,9 @@
 <?php
+
 include 'inc/config.php';
 include 'inc/functions.php';
 
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 $error = '';
 
@@ -15,10 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($username == 'admin' && $password == 'password') {
         $_SESSION['loggedin'] = true;
-        
-        if (ob_get_level()) {
-            ob_end_clean();
-        }
         
         header("Location: views/dashboard.php");
         exit;
