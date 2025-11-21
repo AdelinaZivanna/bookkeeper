@@ -4,7 +4,6 @@ include 'inc/config.php';
 include 'inc/functions.php';
 
 
-
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

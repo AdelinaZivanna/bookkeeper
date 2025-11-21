@@ -1,5 +1,4 @@
 <?php
-session_start();
 include 'config.php';
 
 function kontak_all() {
