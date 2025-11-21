@@ -9,28 +9,43 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-$page_title = "Kategori";
+$page_title = "Kategori"; 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
+if (isset($_POST['add_category'])) {
 
-    $nama  = $_POST['nama'];
-    $jenis = $_POST['jenis'];
-    $ppn   = $_POST['ppn'] ?? 'Non PPN';
+    kategori_add(
+        $_POST['nama'],
+        $_POST['jenis'],
+        $_POST['ppn'] ?? 'Non PPN'
+    );
 
-    kategori_add($nama, $jenis, $ppn);
+    header("Location: kategori.php");
+    exit;
+}
+
+if (isset($_POST['update_category'])) {
+
+    kategori_update(
+        $_POST['id'],
+        $_POST['nama'],
+        $_POST['jenis'],
+        $_POST['ppn'] ?? 'Non PPN'
+    );
 
     header("Location: kategori.php");
     exit;
 }
 
 if (isset($_GET['hapus'])) {
-    $id = intval($_GET['hapus']);
-    kategori_delete($id);
-
+    kategori_delete(intval($_GET['hapus']));
     header("Location: kategori.php");
     exit;
 }
 
+$edit = null;
+if (isset($_GET['edit'])) {
+    $edit = kategori_get($_GET['edit']);
+}
 ?>
 
         <!-- Navbar -->
@@ -42,7 +57,7 @@ if (isset($_GET['hapus'])) {
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link font-weight-bold">Kategori</a>
+                    <a href="#" class="nav-link font-weight-bold">Dashboard</a>
                 </li>
             </ul>
 
@@ -73,84 +88,110 @@ if (isset($_GET['hapus'])) {
         </nav>
         <!-- /.navbar -->
 
-<?php 
-include '../inc/sidebar.php';
-?>
+<?php include '../inc/sidebar.php'; ?>
 
-<div id="page-categories">
-    <div class="card card-outline card-primary shadow-sm">
 
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Kategori</h3>
-            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal-category">
-                <i class="fas fa-plus mr-1"></i> Kategori
-            </button>
-        </div>
+<div class="card card-outline card-primary shadow-sm">
 
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0" id="tbl-categories">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Nama</th>
-                            <th>Jenis</th>
-                            <th>PPN</th>
-                            <th width="80"></th>
-                        </tr>
-                    </thead>
+    <div class="card-header d-flex justify-content-between">
+        <h3 class="card-title">Kategori</h3>
 
-                    <tbody>
-                        <?php 
-                        $kategori = kategori_all();
-                        foreach ($kategori as $k): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($k['nama']); ?></td>
-                                <td><?php echo htmlspecialchars($k['jenis']); ?></td>
-                                <td><?php echo htmlspecialchars($k['ppn'] ?? 'Non PPN'); ?></td>
-                                <td class="text-right">
-                                    <a href="kategori.php?hapus=<?php echo $k['id']; ?>"
-                                       onclick="return confirm('Hapus kategori ini?')"
-                                       class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
+        <button class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#modal-category">
+            <i class="fas fa-plus"></i> Kategori
+        </button>
+    </div>
 
-                </table>
-            </div>
-        </div>
+    <div class="card-body p-0">
+
+        <table class="table table-hover mb-0">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nama</th>
+                    <th>Jenis</th>
+                    <th>PPN</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <?php 
+                $kategori = kategori_all();
+                foreach ($kategori as $k): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($k['nama']) ?></td>
+                        <td><?= htmlspecialchars($k['jenis']) ?></td>
+                        <td><?= htmlspecialchars($k['ppn']) ?></td>
+                        <td>
+
+                            <a href="kategori.php?edit=<?= $k['id'] ?>" 
+                               class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <a href="kategori.php?hapus=<?= $k['id'] ?>"
+                               onclick="return confirm('Hapus kategori?')"
+                               class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+
+                        </td>
+                    </tr>
+                <?php endforeach ?>
+            </tbody>
+
+        </table>
 
     </div>
+
 </div>
 
-<div class="modal fade" id="modal-category" tabindex="-1" aria-hidden="true">
+<div class="modal fade <?php echo $edit ? 'show' : '' ?>"
+     id="modal-category"
+     tabindex="-1"
+     aria-hidden="true"
+     style="<?php echo $edit ? 'display:block; background:rgba(0,0,0,.5);' : '' ?>">
+
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Kategori</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-
             <form method="POST">
-                <input type="hidden" name="add_category" value="1">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <?= $edit ? 'Edit Kategori' : 'Tambah Kategori' ?>
+                    </h5>
+                    <a href="kategori.php" class="close">&times;</a>
+                </div>
 
                 <div class="modal-body">
 
+                    <?php if ($edit): ?>
+                        <input type="hidden" name="id" value="<?= $edit['id'] ?>">
+                    <?php endif ?>
+
                     <div class="form-row">
                         <div class="form-group col-md-8">
-                            <label class="required">Nama</label>
-                            <input type="text" name="nama" class="form-control" required>
+                            <label>Nama</label>
+                            <input type="text" name="nama" class="form-control"
+                                   value="<?= $edit ? htmlspecialchars($edit['nama']) : '' ?>"
+                                   required>
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="required">Jenis</label>
+                            <label>Jenis</label>
                             <select name="jenis" class="custom-select">
-                                <option>Pendapatan</option>
-                                <option>Biaya</option>
-                                <option>Lainnya</option>
+                                <option value="Pendapatan" 
+                                    <?= ($edit && $edit['jenis']=='Pendapatan')?'selected':'' ?>>
+                                        Pendapatan
+                                </option>
+                                <option value="Biaya" 
+                                    <?= ($edit && $edit['jenis']=='Biaya')?'selected':'' ?>>
+                                        Biaya
+                                </option>
+                                <option value="Lainnya" 
+                                    <?= ($edit && $edit['jenis']=='Lainnya')?'selected':'' ?>>
+                                        Lainnya
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -158,20 +199,42 @@ include '../inc/sidebar.php';
                     <div class="form-group">
                         <label>PPN</label>
                         <select name="ppn" class="custom-select">
-                            <option>Non PPN</option>
-                            <option>PPN 11%</option>
+                            <option value="Non PPN" 
+                                <?= ($edit && $edit['ppn']=='Non PPN')?'selected':'' ?>>
+                                Non PPN
+                            </option>
+                            <option value="PPN 11%" 
+                                <?= ($edit && $edit['ppn']=='PPN 11%')?'selected':'' ?>>
+                                PPN 11%
+                            </option>
                         </select>
                     </div>
 
                 </div>
 
-                <div class="sticky-actions text-right">
-                    <button class="btn btn-primary" type="submit">Simpan</button>
+                <div class="modal-footer">
+
+                    <?php if ($edit): ?>
+                        <button type="submit" name="update_category" class="btn btn-warning">Update</button>
+                        <a href="kategori.php" class="btn btn-secondary">Batal</a>
+                    <?php else: ?>
+                        <button type="submit" name="add_category" class="btn btn-primary">Simpan</button>
+                    <?php endif ?>
+
                 </div>
 
             </form>
+
         </div>
     </div>
 </div>
+
+<?php if ($edit): ?>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    $('#modal-category').modal('show');
+});
+</script>
+<?php endif; ?>
 
 <?php include '../inc/footer.php'; ?>
