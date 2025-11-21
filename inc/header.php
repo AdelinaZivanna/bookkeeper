@@ -1,5 +1,13 @@
 <?php
     include 'config.php';
+
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    session_unset();
+    session_destroy();
+    
+    header("Location: ../login.php");
+    exit;
+}
 ?>
 
 
@@ -29,3 +37,4 @@
     <!-- Custom style -->
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+
