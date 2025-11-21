@@ -93,6 +93,14 @@ include '../inc/sidebar.php';
             </div>
         </div>
 
+
+
+
+
+
+
+
+        
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
@@ -167,6 +175,12 @@ include '../inc/sidebar.php';
     </div>
 </div>
 
+
+
+
+
+
+
 <!-- Modal Transfer -->
 <div class="modal fade" id="modal-transfer" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -237,7 +251,7 @@ include '../inc/sidebar.php';
 <div class="modal fade" id="modal-transaksi-bank" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
-            <form method="POST" id="formTransaksi">
+            <form method="POST" id="formTransaksi" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Tambah Transaksi</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -291,17 +305,27 @@ include '../inc/sidebar.php';
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="required">Jumlah</label>
-                        <input type="number" class="form-control" name="jumlah" id="formJumlah"
-                               min="0" step="1000" placeholder="0" required>
-                        <small class="form-text text-muted">Masukkan nominal dalam Rupiah</small>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label class="required">Tipe</label>
+                            <select class="custom-select" name="tipe" id="formTipe" required>
+                                <option value="pengeluaran">Pengeluaran</option>
+                                <option value="pemasukan">Pemasukan</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label class="required">Jumlah</label>
+                            <input type="number" class="form-control" name="jumlah" id="formJumlah"
+                                   min="0" step="1000" placeholder="0" required>
+                            <small class="form-text text-muted">Masukkan nominal dalam Rupiah</small>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Lampiran</label>
                         <input type="file" class="form-control-file" name="lampiran" accept="image/*,application/pdf">
-                        <small class="form-text text-muted">Format: JPG, PNG, PDF (Max 2MB)</small>
+                        <small class="form-text text-muted">Format: JPG, PNG, PDF (Max 2MB) — upload handling belum otomatis disimpan</small>
                     </div>
                 </div>
 
@@ -346,7 +370,9 @@ function editData(btn) {
     document.getElementById('formDeskripsi').value = deskripsi;
     document.getElementById('formKategori').value = kategori;
     document.getElementById('formAkun').value = akun;
-    document.getElementById('formJumlah').value = jumlah;
+    document.getElementById('formJumlah').value = Math.abs(jumlah); // tampilkan nilai positif
+    // set tipe berdasarkan tanda jumlah
+    document.getElementById('formTipe').value = (parseInt(jumlah) < 0) ? 'pengeluaran' : 'pemasukan';
     
     // Ubah text button submit
     document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-save mr-1"></i> Update';

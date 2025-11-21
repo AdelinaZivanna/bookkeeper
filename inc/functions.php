@@ -1,6 +1,10 @@
 <?php
-include 'config.php';
+// inc/functions.php
+include 'config.php'; // pastikan path benar: inc/config.php
 
+// -----------------------------
+// KONTAK
+// -----------------------------
 function kontak_all() {
     global $conn;
     return mysqli_query($conn, "SELECT * FROM kontak ORDER BY id DESC");
@@ -20,6 +24,9 @@ function kontak_delete($id) {
     return $stmt->execute();
 }
 
+// -----------------------------
+// KATEGORI
+// -----------------------------
 function kategori_all() {
     global $conn;
     $sql = "SELECT * FROM kategori ORDER BY id DESC";
@@ -45,6 +52,9 @@ function kategori_delete($id) {
     return mysqli_query($conn, "DELETE FROM kategori WHERE id = $id");
 }
 
+// -----------------------------
+// AKUN
+// -----------------------------
 function akun_all() {
     global $conn;
     $sql = "SELECT * FROM akun ORDER BY id DESC";
@@ -71,6 +81,9 @@ function akun_delete($id) {
     return $stmt->execute();
 }
 
+// -----------------------------
+// SETTINGS
+// -----------------------------
 function settings_get() {
     global $conn;
     $sql = "SELECT * FROM settings WHERE id = 1 LIMIT 1";
@@ -91,6 +104,9 @@ function settings_update($nama, $mata_uang, $ppn, $periode) {
     return $stmt->execute();
 }
 
+// -----------------------------
+// KAS KECIL
+// -----------------------------
 function createKasKecil($conn, $data) {
     $tanggal = mysqli_real_escape_string($conn, $data['tanggal']);
     $deskripsi = mysqli_real_escape_string($conn, $data['deskripsi']);
@@ -220,28 +236,40 @@ function searchKasKecil($conn, $keyword) {
 
 // ==========================================
 // FUNCTIONS UNTUK TRANSAKSI KAS & BANK
-// File: inc/functions.php (tambahkan di bagian bawah)
 // ==========================================
-
-/**
- * Create transaksi kas & bank
- */
 function createTransaksi($conn, $data) {
     $tanggal = mysqli_real_escape_string($conn, $data['tanggal']);
     $deskripsi = mysqli_real_escape_string($conn, $data['deskripsi']);
     $kategori = mysqli_real_escape_string($conn, $data['kategori']);
-    $akun = mysqli_real_escape_string($conn, $data['akun']);
-    $jumlah = (int)$data['jumlah'];
-    
-    $query = "INSERT INTO transaksi (tanggal, deskripsi, kategori, akun, jumlah) 
-              VALUES ('$tanggal', '$deskripsi', '$kategori', '$akun', $jumlah)";
-    
-    return mysqli_query($conn, $query);
+    $akun = mysqli_real_escape_string($conn, $data['akun']); // nama akun
+    $jumlah_input = (int)$data['jumlah'];
+    $tipe = isset($data['tipe']) ? $data['tipe'] : 'pengeluaran'; // default pengeluaran
+
+    // sesuaikan tanda jumlah berdasarkan tipe
+    if ($tipe === 'pengeluaran') {
+        $jumlah = -abs($jumlah_input);
+    } else {
+        $jumlah = abs($jumlah_input);
+    }
+
+    // 1) insert transaksi (simpan jumlah sudah bertanda +/-)
+    $stmt = $conn->prepare("INSERT INTO transaksi (tanggal, deskripsi, kategori, akun, jumlah) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssi", $tanggal, $deskripsi, $kategori, $akun, $jumlah);
+    $res = $stmt->execute();
+    if (!$res) {
+        return false;
+    }
+
+    // 2) update saldo akun (saldoawal kolom digunakan sebagai saldo sekarang)
+    $safeJumlah = $jumlah; // sudah integer
+    $akunEsc = mysqli_real_escape_string($conn, $akun);
+    $updateQuery = "UPDATE akun SET saldoawal = saldoawal + ($safeJumlah) WHERE nama = '$akunEsc'";
+    mysqli_query($conn, $updateQuery);
+
+    return true;
 }
 
-/**
- * Update transaksi kas & bank
- */
+
 function updateTransaksi($conn, $id, $data) {
     $id = (int)$id;
     $tanggal = mysqli_real_escape_string($conn, $data['tanggal']);
@@ -249,7 +277,7 @@ function updateTransaksi($conn, $id, $data) {
     $kategori = mysqli_real_escape_string($conn, $data['kategori']);
     $akun = mysqli_real_escape_string($conn, $data['akun']);
     $jumlah = (int)$data['jumlah'];
-    
+
     $query = "UPDATE transaksi 
               SET tanggal='$tanggal', 
                   deskripsi='$deskripsi', 
@@ -261,35 +289,76 @@ function updateTransaksi($conn, $id, $data) {
     return mysqli_query($conn, $query);
 }
 
-/**
- * Delete transaksi kas & bank
- */
 function deleteTransaksi($conn, $id) {
     $id = (int)$id;
+    // ambil transaksi dulu supaya bisa koreksi saldo
+    $res = mysqli_query($conn, "SELECT * FROM transaksi WHERE id=$id");
+    $row = mysqli_fetch_assoc($res);
+    if ($row) {
+        $akun = mysqli_real_escape_string($conn, $row['akun']);
+        $jumlah = (int)$row['jumlah'];
+        // koreksi saldo: kurangi efek transaksi yang dihapus (karena saat insert kita menambahkan jumlah ke akun)
+        $corr = -$jumlah;
+        mysqli_query($conn, "UPDATE akun SET saldoawal = saldoawal + ($corr) WHERE nama = '$akun'");
+    }
+
     $query = "DELETE FROM transaksi WHERE id=$id";
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get single transaksi by ID
- */
 function getTransaksiById($conn, $id) {
     $id = (int)$id;
     $result = mysqli_query($conn, "SELECT * FROM transaksi WHERE id=$id");
     return mysqli_fetch_assoc($result);
 }
 
-/**
- * Get all transaksi kas & bank
- */
-function getAllTransaksi($conn, $orderBy = 'tanggal DESC') {
-    $query = "SELECT * FROM transaksi ORDER BY $orderBy";
+
+
+
+
+
+
+
+
+// ======================
+// GET ALL TRANSAKSI (FINAL FIX)
+// ======================
+function getAllTransaksi($conn, $orderBy = 'tanggal DESC', $limit = null) {
+
+    // Sanitasi kolom ORDER BY
+    $orderByClean = mysqli_real_escape_string($conn, $orderBy);
+
+    // Jika limit null → tampilkan SEMUA transaksi
+    if ($limit === null) {
+        $query = "SELECT * FROM transaksi ORDER BY $orderByClean";
+    } else {
+        // Jika limit angka → batasi
+        $limit = (int)$limit;
+        $query = "SELECT * FROM transaksi ORDER BY $orderByClean LIMIT $limit";
+    }
+
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get total transaksi
- */
+
+
+
+function insertTransaksi($conn, $data) {
+    $tanggal = $data['tanggal'];
+    $deskripsi = $data['deskripsi'];
+    $kategori = $data['kategori'];
+    $akun = $data['akun'];
+    $jumlah = $data['jumlah'];
+
+    $sql = "INSERT INTO transaksi (tanggal, deskripsi, kategori, akun, jumlah)
+            VALUES ('$tanggal', '$deskripsi', '$kategori', '$akun', '$jumlah')";
+    return mysqli_query($conn, $sql);
+}
+
+
+
+
+
 function getTotalTransaksi($conn, $startDate = null, $endDate = null) {
     $query = "SELECT SUM(jumlah) as total FROM transaksi WHERE 1=1";
     
@@ -308,9 +377,6 @@ function getTotalTransaksi($conn, $startDate = null, $endDate = null) {
     return (int)$row['total'];
 }
 
-/**
- * Get transaksi by date range
- */
 function getTransaksiByDateRange($conn, $startDate, $endDate) {
     $startDate = mysqli_real_escape_string($conn, $startDate);
     $endDate = mysqli_real_escape_string($conn, $endDate);
@@ -322,27 +388,18 @@ function getTransaksiByDateRange($conn, $startDate, $endDate) {
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get transaksi by kategori
- */
 function getTransaksiByKategori($conn, $kategori) {
     $kategori = mysqli_real_escape_string($conn, $kategori);
     $query = "SELECT * FROM transaksi WHERE kategori='$kategori' ORDER BY tanggal DESC";
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get transaksi by akun
- */
 function getTransaksiByAkun($conn, $akun) {
     $akun = mysqli_real_escape_string($conn, $akun);
     $query = "SELECT * FROM transaksi WHERE akun='$akun' ORDER BY tanggal DESC";
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get statistik transaksi by kategori
- */
 function getTransaksiStatsByKategori($conn) {
     $query = "SELECT kategori, COUNT(*) as jumlah_transaksi, SUM(jumlah) as total 
               FROM transaksi 
@@ -352,9 +409,6 @@ function getTransaksiStatsByKategori($conn) {
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get statistik transaksi by akun
- */
 function getTransaksiStatsByAkun($conn) {
     $query = "SELECT akun, COUNT(*) as jumlah_transaksi, SUM(jumlah) as total 
               FROM transaksi 
@@ -364,9 +418,6 @@ function getTransaksiStatsByAkun($conn) {
     return mysqli_query($conn, $query);
 }
 
-/**
- * Search transaksi
- */
 function searchTransaksi($conn, $keyword) {
     $keyword = mysqli_real_escape_string($conn, $keyword);
     $query = "SELECT * FROM transaksi 
@@ -378,29 +429,25 @@ function searchTransaksi($conn, $keyword) {
     return mysqli_query($conn, $query);
 }
 
-/**
- * Get list semua akun (kas + bank)
- */
 function getAllAkunList($conn) {
-    return mysqli_query($conn, "SELECT nama, jenis, saldoawal, mata_uang FROM akun ORDER BY nama ASC");
+    return mysqli_query($conn, "SELECT id, nama, jenis, saldoawal, mata_uang FROM akun ORDER BY nama ASC");
 }
 
-// ==========================================
-// SHARED FUNCTIONS (jika belum ada)
-// ==========================================
 
-/**
- * Get list kategori untuk dropdown (shared dengan kas kecil)
- */
+
+function getTotalSaldo($conn) {
+    $result = mysqli_query($conn, "SELECT SUM(saldoawal) AS total FROM akun");
+    $row = mysqli_fetch_assoc($result);
+    return (int)$row['total'];
+}
+
+// SHARED FALLBACKS
 if (!function_exists('getKategoriList')) {
     function getKategoriList($conn) {
         return mysqli_query($conn, "SELECT DISTINCT nama FROM kategori ORDER BY nama ASC");
     }
 }
 
-/**
- * Get list akun kas untuk dropdown (shared dengan kas kecil)
- */
 if (!function_exists('getAkunKasList')) {
     function getAkunKasList($conn) {
         return mysqli_query($conn, "SELECT nama, saldoawal, mata_uang FROM akun WHERE jenis='kas' ORDER BY nama ASC");

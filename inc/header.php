@@ -1,14 +1,5 @@
 <?php
-    session_start();
-    include 'config.php';
-
-    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    session_unset();
-    session_destroy();
-    
-    header("Location: ../login.php");
-    exit;
-}
+include 'config.php';
 ?>
 
 
