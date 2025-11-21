@@ -11,12 +11,7 @@
         </footer>
 
     </div>
-    <!-- ./wrapper -->
-
-    <!-- MODALS ======================================================= -->
-
-
-    <!-- Contact Modal -->
+   
     <div class="modal fade" id="modal-contact" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
