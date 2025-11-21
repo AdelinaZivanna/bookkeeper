@@ -36,8 +36,7 @@ $page_title = "Dashboard";
                         <a href="#" class="dropdown-item" data-nav="#page-settings"><i class="fas fa-cog mr-2"></i>
                             Pengaturan</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt mr-2"></i>
-                            Keluar</a>
+                        <a href="?logout=1" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin keluar?')"> <i class="fas fa-sign-out-alt mr-2"></i> Keluar</a>
                     </div>
                 </li>
             </ul>
