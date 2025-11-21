@@ -3,6 +3,10 @@ session_start();
 include 'inc/config.php';
 include 'inc/functions.php';
 
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    header("Location: views/dashboard.php");
+    exit;
+}
 
 $error = '';
 
