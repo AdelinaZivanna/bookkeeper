@@ -3,6 +3,7 @@ include '../inc/config.php';
 include '../inc/functions.php';
 
 $page_title = "Akun"; 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
     $nama = $_POST['nama'];
     $jenis = $_POST['jenis'];
@@ -35,7 +36,7 @@ include '../inc/header.php';
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link font-weight-bold">Akun</a>
+                    <a href="#" class="nav-link font-weight-bold">Dashboard</a>
                 </li>
             </ul>
 

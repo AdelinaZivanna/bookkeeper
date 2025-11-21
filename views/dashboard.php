@@ -1,6 +1,8 @@
 <?php 
 include '../inc/header.php';
-$page_title = "Dashboard";
+
+$page_title = "Dashboard"; 
+
 ?>
 
         <!-- Navbar -->
