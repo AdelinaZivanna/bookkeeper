@@ -1,11 +1,31 @@
 <?php
 include '../inc/config.php';
 include '../inc/functions.php';
+include '../inc/header.php';
 
-$page_title = "Kontak";
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
+$page_title = "Kontak"; 
 
 if (isset($_POST['add_contact'])) {
     kontak_add(
+        $_POST['nama'],
+        $_POST['jenis'],
+        $_POST['email'],
+        $_POST['telepon']
+    );
+
+    header("Location: kontak.php");
+    exit;
+}
+
+if (isset($_POST['update_contact'])) {
+    kontak_update(
+        $_POST['id'],
         $_POST['nama'],
         $_POST['jenis'],
         $_POST['email'],
@@ -22,9 +42,15 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
+
+$edit = null;
+if (isset($_GET['edit'])) {
+    $edit = kontak_get($_GET['edit']);
+}
+
 $kontaks = kontak_all();
 
-include '../inc/header.php';
+
 ?>
 
         <!-- Navbar -->
@@ -36,7 +62,7 @@ include '../inc/header.php';
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link font-weight-bold">Kontak</a>
+                    <a href="#" class="nav-link font-weight-bold">Dashboard</a>
                 </li>
             </ul>
 
@@ -60,21 +86,19 @@ include '../inc/header.php';
                         <a href="#" class="dropdown-item" data-nav="#page-settings"><i class="fas fa-cog mr-2"></i>
                             Pengaturan</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt mr-2"></i>
-                            Keluar</a>
+                        <a href="?logout=1" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin keluar?')"> <i class="fas fa-sign-out-alt mr-2"></i> Keluar</a>
                     </div>
                 </li>
             </ul>
         </nav>
         <!-- /.navbar -->
-<?php 
-include '../inc/sidebar.php';
-?>
+
+<?php include '../inc/sidebar.php'; ?>
 
 <div class="card card-outline card-primary shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">Kontak</h3>
-        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-contact">
+        <button class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#modal-contact">
             <i class="fas fa-plus mr-1"></i> Kontak
         </button>
     </div>
@@ -96,15 +120,19 @@ include '../inc/sidebar.php';
                     <?php if (!empty($kontaks)) : ?>
                         <?php foreach ($kontaks as $k): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($k['nama']) ?></td>
-                                <td><?php echo htmlspecialchars($k['jenis']) ?></td>
-                                <td><?php echo htmlspecialchars($k['email']) ?></td>
-                                <td><?php echo htmlspecialchars($k['telepon']) ?></td>
+                                <td><?= htmlspecialchars($k['nama']) ?></td>
+                                <td><?= htmlspecialchars($k['jenis']) ?></td>
+                                <td><?= htmlspecialchars($k['email']) ?></td>
+                                <td><?= htmlspecialchars($k['telepon']) ?></td>
                                 <td>
-                                    <a href="?delete=<?php echo $k['id'] ?>" 
-                                       class="btn btn-sm btn-danger"
-                                       onclick="return confirm('Hapus kontak ini?')">
-                                        Hapus
+                                    <a href="?edit=<?= $k['id'] ?>" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <a href="?delete=<?= $k['id'] ?>"
+                                       onclick="return confirm('Hapus kontak ini?')"
+                                       class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -122,29 +150,45 @@ include '../inc/sidebar.php';
     </div>
 </div>
 
-<div class="modal fade" id="modal-contact" tabindex="-1" aria-hidden="true">
+<div class="modal fade <?php echo $edit ? 'show' : '' ?>" id="modal-contact"
+    tabindex="-1" aria-hidden="true"
+    style="<?php echo $edit ? 'display:block; background:rgba(0,0,0,.5);' : '' ?>">
     <div class="modal-dialog">
         <div class="modal-content">
 
             <form method="POST">
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah Kontak</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title">
+                        <?= $edit ? 'Edit Kontak' : 'Tambah Kontak' ?>
+                    </h5>
+                    <a href="kontak.php" class="close">&times;</a>
                 </div>
 
                 <div class="modal-body">
 
+                    <?php if ($edit): ?>
+                        <input type="hidden" name="id" value="<?= $edit['id'] ?>">
+                    <?php endif ?>
+
                     <div class="form-row">
                         <div class="form-group col-md-8">
                             <label>Nama <span class="text-danger">*</span></label>
-                            <input type="text" name="nama" class="form-control" required>
+                            <input type="text" name="nama" class="form-control"
+                                value="<?= $edit ? htmlspecialchars($edit['nama']) : '' ?>"
+                                required>
                         </div>
 
                         <div class="form-group col-md-4">
                             <label>Jenis <span class="text-danger">*</span></label>
                             <select name="jenis" class="custom-select" required>
-                                <option value="Customer">Customer</option>
-                                <option value="Vendor">Vendor</option>
+                                <option value="Customer"
+                                    <?= ($edit && $edit['jenis']=='Customer') ? 'selected' : '' ?>>
+                                    Customer
+                                </option>
+                                <option value="Vendor"
+                                    <?= ($edit && $edit['jenis']=='Vendor') ? 'selected' : '' ?>>
+                                    Vendor
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -152,28 +196,44 @@ include '../inc/sidebar.php';
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Email</label>
-                            <input type="email" name="email" class="form-control">
+                            <input type="email" name="email" class="form-control"
+                                value="<?= $edit ? htmlspecialchars($edit['email']) : '' ?>">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label>Telepon</label>
-                            <input type="text" name="telepon" class="form-control">
+                            <input type="text" name="telepon" class="form-control"
+                                value="<?= $edit ? htmlspecialchars($edit['telepon']) : '' ?>">
                         </div>
                     </div>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" name="add_contact" class="btn btn-primary">
-                        Simpan
-                    </button>
+                    <?php if ($edit): ?>
+                        <button type="submit" name="update_contact" class="btn btn-warning">
+                            Update
+                        </button>
+                        <a href="kontak.php" class="btn btn-secondary">Batal</a>
+                    <?php else: ?>
+                        <button type="submit" name="add_contact" class="btn btn-primary">
+                            Simpan
+                        </button>
+                    <?php endif ?>
                 </div>
+
             </form>
 
         </div>
     </div>
 </div>
 
-<?php include '../inc/footer.php';
-?>
+<?php if ($edit): ?>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    $('#modal-contact').modal('show');
+});
+</script>
+<?php endif; ?>
 
+<?php include '../inc/footer.php'; ?>

@@ -1,8 +1,15 @@
 <?php 
 include '../inc/config.php';
 include '../inc/functions.php';
+include '../inc/header.php';
 
 $page_title = "Transaksi Kas & Bank"; 
+
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
 
 // Handle POST untuk Create/Update/Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,9 +38,8 @@ $result = getAllTransaksi($conn);
 $kategoriList = getKategoriList($conn);
 $akunList = getAllAkunList($conn);
 
-include '../inc/header.php';
-?>
 
+?>
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
 
@@ -43,7 +49,7 @@ include '../inc/header.php';
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link font-weight-bold">Transaksi Kas & Bank</a>
+                    <a href="#" class="nav-link font-weight-bold">Dashboard</a>
                 </li>
             </ul>
 
@@ -67,8 +73,7 @@ include '../inc/header.php';
                         <a href="#" class="dropdown-item" data-nav="#page-settings"><i class="fas fa-cog mr-2"></i>
                             Pengaturan</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt mr-2"></i>
-                            Keluar</a>
+                        <a href="?logout=1" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin keluar?')"> <i class="fas fa-sign-out-alt mr-2"></i> Keluar</a>
                     </div>
                 </li>
             </ul>
@@ -83,7 +88,7 @@ include '../inc/sidebar.php';
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Transaksi Kas & Bank</h3>
-            <div>
+            <div class="ml-auto">
                 <button class="btn btn-outline-primary btn-sm mr-1" data-toggle="modal" data-target="#modal-transfer">
                     <i class="fas fa-random mr-1"></i> Transfer
                 </button>
@@ -106,12 +111,13 @@ include '../inc/sidebar.php';
                 <table class="table table-hover mb-0">
                     <thead class="thead-light">
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Deskripsi</th>
-                            <th>Kategori</th>
-                            <th>Akun</th>
-                            <th class="text-right">Jumlah</th>
-                            <th>Aksi</th>
+                            <th width="50">No</th>
+                            <th width="100">Tanggal</th>
+                            <th width="150">Deskripsi</th>
+                            <th width="150">Kategori</th>
+                            <th width="100">Akun</th>
+                            <th width="120" class="text-right">Jumlah</th>
+                            <th width="100" class="text-center">Aksi</th>
                         </tr>
                     </thead>
 
@@ -119,18 +125,20 @@ include '../inc/sidebar.php';
                         <?php 
                         $total = 0;
                         $hasData = false;
+                        $no = 1;
                         while ($row = mysqli_fetch_assoc($result)):
                             $hasData = true;
                             $total += $row['jumlah'];
                         ?>
                             <tr>
+                                <td><?php echo $no++ ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($row['tanggal'])) ?></td>
                                 <td><?php echo htmlspecialchars($row['deskripsi']) ?></td>
                                 <td><?php echo htmlspecialchars($row['kategori']) ?></td>
                                 <td><?php echo htmlspecialchars($row['akun']) ?></td>
                                 <td class="text-right">Rp <?php echo number_format($row['jumlah'],0,',','.') ?></td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-warning" 
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-warning mr-1" 
                                             onclick="editData(this)"
                                             data-id="<?php echo $row['id'] ?>"
                                             data-tanggal="<?php echo $row['tanggal'] ?>"
@@ -153,7 +161,7 @@ include '../inc/sidebar.php';
 
                         <?php if (!$hasData): ?>
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-3">
+                                <td colspan="7" class="text-center text-muted py-3">
                                     Belum ada transaksi.
                                 </td>
                             </tr>
@@ -163,7 +171,7 @@ include '../inc/sidebar.php';
                     <?php if ($hasData): ?>
                     <tfoot>
                         <tr class="font-weight-bold">
-                            <td colspan="4" class="text-right">Total Transaksi:</td>
+                            <td colspan="5" class="text-right">Total Transaksi:</td>
                             <td class="text-right">Rp <?php echo number_format($total,0,',','.') ?></td>
                             <td></td>
                         </tr>

@@ -27,6 +27,21 @@ function kontak_delete($id) {
 // -----------------------------
 // KATEGORI
 // -----------------------------
+function kontak_get($id) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT * FROM kontak WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function kontak_update($id, $nama, $jenis, $email, $telepon) {
+    global $conn;
+    $stmt = $conn->prepare("UPDATE kontak SET nama=?, jenis=?, email=?, telepon=? WHERE id=?");
+    $stmt->bind_param("ssssi", $nama, $jenis, $email, $telepon, $id);
+    return $stmt->execute();
+}
+
 function kategori_all() {
     global $conn;
     $sql = "SELECT * FROM kategori ORDER BY id DESC";
@@ -55,6 +70,22 @@ function kategori_delete($id) {
 // -----------------------------
 // AKUN
 // -----------------------------
+function kategori_get($id) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT * FROM kategori WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function kategori_update($id, $nama, $jenis, $ppn) {
+    global $conn;
+    $stmt = $conn->prepare("UPDATE kategori SET nama=?, jenis=?, ppn=? WHERE id=?");
+    $stmt->bind_param("sssi", $nama, $jenis, $ppn, $id);
+    return $stmt->execute();
+}
+
+
 function akun_all() {
     global $conn;
     $sql = "SELECT * FROM akun ORDER BY id DESC";
