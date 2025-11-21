@@ -198,6 +198,7 @@ include '../inc/sidebar.php';
                             <label class="required">Kategori</label>
                             <select class="custom-select" name="kategori" id="formKategori" required>
                                 <option value="">-- Pilih Kategori --</option>
+                                <option value="">Makan</option>
                                 <?php 
                                 mysqli_data_seek($kategoriList, 0);
                                 while($kat = mysqli_fetch_assoc($kategoriList)): 

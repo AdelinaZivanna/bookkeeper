@@ -97,15 +97,25 @@ include '../inc/sidebar.php';
                     <tbody>
                         <?php 
                         $akun = akun_all();
-                        foreach ($akun as $a): ?>
+                        $transaksi_kas = getAllKasKecil($conn);
+                        
+                        $total_pengeluaran = 0;
+                        while ($transaksi = mysqli_fetch_assoc($transaksi_kas)) {
+                            $total_pengeluaran += $transaksi['jumlah'];
+                        }
+                        
+                        foreach ($akun as $a): 
+                            $saldoakhir = $a['saldoawal'] - $total_pengeluaran;
+                        ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($a['nama']); ?></td>
                                 <td><?php echo htmlspecialchars($a['jenis']); ?></td>
                                 <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
+                                <td>Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
                                 <td class="text-right">
                                     <a href="akun.php?hapus=<?php echo $a['id']; ?>"
-                                       onclick="return confirm('Hapus akun ini?')"
-                                       class="btn btn-sm btn-danger">
+                                    onclick="return confirm('Hapus akun ini?')"
+                                    class="btn btn-sm btn-danger">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>

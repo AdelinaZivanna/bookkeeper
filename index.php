@@ -1,13 +1,8 @@
 <?php
 include 'inc/config.php';
+include 'inc/header.php';
 include 'inc/functions.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
-
-include 'inc/header.php';
 
 $page = $_GET['page'] ?? 'dashboard';
 
