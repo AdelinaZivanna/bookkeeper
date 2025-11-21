@@ -10,33 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'];
         
         if ($action === 'create') {
-            $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
-            $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-            $kategori = mysqli_real_escape_string($conn, $_POST['kategori']);
-            $akun = mysqli_real_escape_string($conn, $_POST['akun']);
-            $jumlah = (int)$_POST['jumlah'];
-            
-            $query = "INSERT INTO kaskecil (tanggal, deskripsi, kategori, akun, jumlah) 
-                      VALUES ('$tanggal', '$deskripsi', '$kategori', '$akun', $jumlah)";
-            mysqli_query($conn, $query);
+            createKasKecil($conn, $_POST);
             
         } elseif ($action === 'update') {
-            $id = (int)$_POST['id'];
-            $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
-            $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-            $kategori = mysqli_real_escape_string($conn, $_POST['kategori']);
-            $akun = mysqli_real_escape_string($conn, $_POST['akun']);
-            $jumlah = (int)$_POST['jumlah'];
-            
-            $query = "UPDATE kaskecil SET tanggal='$tanggal', deskripsi='$deskripsi', kategori='$kategori', akun='$akun', jumlah=$jumlah WHERE id=$id";
-            mysqli_query($conn, $query);
+            updateKasKecil($conn, $_POST['id'], $_POST);
             
         } elseif ($action === 'delete' && isset($_POST['id'])) {
-            $id = (int)$_POST['id'];
-            $query = "DELETE FROM kaskecil WHERE id=$id";
-            mysqli_query($conn, $query);
+            deleteKasKecil($conn, $_POST['id']);
         }
-        header("Location: kas_kecil.php");
+        
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit;
     }
 }
@@ -44,17 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle GET untuk Edit
 $editData = null;
 if (isset($_GET['edit'])) {
-    $id = (int)$_GET['edit'];
-    $result = mysqli_query($conn, "SELECT * FROM kaskecil WHERE id=$id");
-    $editData = mysqli_fetch_assoc($result);
+    $editData = getKasKecilById($conn, $_GET['edit']);
 }
 
 // Ambil semua data
-$result = mysqli_query($conn, "SELECT * FROM kaskecil ORDER BY tanggal DESC");
+$result = getAllKasKecil($conn);
 
 // Data kategori & akun
-$kategoriList = mysqli_query($conn, "SELECT DISTINCT nama FROM kategori ORDER BY nama ASC");
-$akunList = mysqli_query($conn, "SELECT nama, saldoawal FROM akun WHERE jenis='kas' ORDER BY nama ASC");
+$kategoriList = getKategoriList($conn);
+$akunList = getAkunKasList($conn);
 
 include '../inc/header.php';
 ?>
@@ -104,17 +85,18 @@ include '../inc/header.php';
 include '../inc/sidebar.php';
 ?>
 
-<div class="container-fluid pt-2"> <!-- pt-2 supaya card agak nempel atas -->
+<div class="container-fluid pt-2">
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Kas Kecil</h3>
-            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal-transaksi-kas">
+            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-transaksi-kas">
                 <i class="fas fa-plus mr-1"></i> Pengeluaran
             </button>
         </div>
+
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0" id="tbl-petty" style="margin-left:0;">
+                <table class="table table-hover mb-0">
                     <thead class="thead-light">
                         <tr>
                             <th>Tanggal</th>
@@ -125,40 +107,61 @@ include '../inc/sidebar.php';
                             <th>Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php 
                         $total = 0;
+                        $hasData = false;
                         while ($row = mysqli_fetch_assoc($result)):
+                            $hasData = true;
                             $total += $row['jumlah'];
                         ?>
-                        <tr>
-                            <td><?php echo date('d/m/Y', strtotime($row['tanggal'])); ?></td>
-                            <td><?php echo htmlspecialchars($row['deskripsi']); ?></td>
-                            <td><?php echo htmlspecialchars($row['kategori']); ?></td>
-                            <td><?php echo htmlspecialchars($row['akun']); ?></td>
-                            <td class="text-right">Rp <?php echo number_format($row['jumlah'],0,',','.'); ?></td>
-                            <td>
-                                <a href="?edit=<?php echo $row['id']; ?>" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form method="POST" style="display:inline;">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus data ini?')">
-                                        <i class="fas fa-trash"></i>
+                            <tr>
+                                <td><?php echo date('d/m/Y', strtotime($row['tanggal'])) ?></td>
+                                <td><?php echo htmlspecialchars($row['deskripsi']) ?></td>
+                                <td><?php echo htmlspecialchars($row['kategori']) ?></td>
+                                <td><?php echo htmlspecialchars($row['akun']) ?></td>
+                                <td class="text-right">Rp <?php echo number_format($row['jumlah'],0,',','.') ?></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning" 
+                                            onclick="editData(this)"
+                                            data-id="<?php echo $row['id'] ?>"
+                                            data-tanggal="<?php echo $row['tanggal'] ?>"
+                                            data-deskripsi="<?php echo htmlspecialchars($row['deskripsi']) ?>"
+                                            data-kategori="<?php echo htmlspecialchars($row['kategori']) ?>"
+                                            data-akun="<?php echo htmlspecialchars($row['akun']) ?>"
+                                            data-jumlah="<?php echo $row['jumlah'] ?>">
+                                        <i class="fas fa-edit"></i>
                                     </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
+                                    <form method="POST" style="display:inline;">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $row['id'] ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus data ini?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endwhile ?>
+
+                        <?php if (!$hasData): ?>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">
+                                    Belum ada transaksi kas kecil.
+                                </td>
+                            </tr>
+                        <?php endif ?>
                     </tbody>
+
+                    <?php if ($hasData): ?>
                     <tfoot>
                         <tr class="font-weight-bold">
                             <td colspan="4" class="text-right">Total Pengeluaran:</td>
-                            <td class="text-right">Rp <?php echo number_format($total,0,',','.'); ?></td>
+                            <td class="text-right">Rp <?php echo number_format($total,0,',','.') ?></td>
                             <td></td>
                         </tr>
                     </tfoot>
+                    <?php endif ?>
                 </table>
             </div>
         </div>
@@ -171,56 +174,70 @@ include '../inc/sidebar.php';
         <div class="modal-content">
             <form method="POST" id="formTransaksi">
                 <div class="modal-header">
-                    <h5 class="modal-title"><?php echo $editData ? 'Edit Transaksi' : 'Tambah Transaksi'; ?></h5>
+                    <h5 class="modal-title" id="modalTitle">Tambah Transaksi</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="action" value="<?php echo $editData ? 'update' : 'create'; ?>">
-                    <?php if($editData): ?>
-                        <input type="hidden" name="id" value="<?php echo $editData['id']; ?>">
-                    <?php endif; ?>
+                    <input type="hidden" name="action" id="formAction" value="create">
+                    <input type="hidden" name="id" id="formId" value="">
 
                     <div class="form-group">
                         <label class="required">Tanggal</label>
-                        <input type="date" class="form-control" name="tanggal" value="<?php echo $editData['tanggal'] ?? date('Y-m-d'); ?>" required>
+                        <input type="date" class="form-control" name="tanggal" id="formTanggal" 
+                               value="<?php echo date('Y-m-d') ?>" required>
                     </div>
+
                     <div class="form-group">
                         <label class="required">Deskripsi</label>
-                        <input type="text" class="form-control" name="deskripsi" value="<?php echo htmlspecialchars($editData['deskripsi'] ?? ''); ?>" required>
+                        <input type="text" class="form-control" name="deskripsi" id="formDeskripsi"
+                               placeholder="Contoh: Beli ATK" required>
                     </div>
+
                     <div class="form-row">
                         <div class="form-group col-6">
                             <label class="required">Kategori</label>
-                            <select class="custom-select" name="kategori" required>
+                            <select class="custom-select" name="kategori" id="formKategori" required>
                                 <option value="">-- Pilih Kategori --</option>
-                                <?php mysqli_data_seek($kategoriList,0);
-                                while($kat=mysqli_fetch_assoc($kategoriList)): ?>
-                                    <option value="<?php echo htmlspecialchars($kat['nama']); ?>" <?php echo ($editData['kategori']??'')==$kat['nama']?'selected':''; ?>>
-                                        <?php echo htmlspecialchars($kat['nama']); ?>
+                                <?php 
+                                mysqli_data_seek($kategoriList, 0);
+                                while($kat = mysqli_fetch_assoc($kategoriList)): 
+                                ?>
+                                    <option value="<?php echo htmlspecialchars($kat['nama']) ?>">
+                                        <?php echo htmlspecialchars($kat['nama']) ?>
                                     </option>
-                                <?php endwhile; ?>
+                                <?php endwhile ?>
                             </select>
                         </div>
+
                         <div class="form-group col-6">
                             <label class="required">Akun</label>
-                            <select class="custom-select" name="akun" required>
+                            <select class="custom-select" name="akun" id="formAkun" required>
                                 <option value="">-- Pilih Akun --</option>
-                                <?php mysqli_data_seek($akunList,0);
-                                while($akun=mysqli_fetch_assoc($akunList)): ?>
-                                    <option value="<?php echo htmlspecialchars($akun['nama']); ?>" <?php echo ($editData['akun']??'')==$akun['nama']?'selected':''; ?>>
-                                        <?php echo htmlspecialchars($akun['nama']); ?> (Saldo: <?php echo number_format($akun['saldoawal'],0,',','.'); ?>)
+                                <?php 
+                                mysqli_data_seek($akunList, 0);
+                                while($akun = mysqli_fetch_assoc($akunList)): 
+                                ?>
+                                    <option value="<?php echo htmlspecialchars($akun['nama']) ?>">
+                                        <?php echo htmlspecialchars($akun['nama']) ?> 
+                                        (Saldo: Rp <?php echo number_format($akun['saldoawal'],0,',','.') ?>)
                                     </option>
-                                <?php endwhile; ?>
+                                <?php endwhile ?>
                             </select>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label class="required">Jumlah</label>
-                        <input type="number" class="form-control" name="jumlah" value="<?php echo $editData['jumlah'] ?? ''; ?>" min="0" step="1000" required>
+                        <input type="number" class="form-control" name="jumlah" id="formJumlah"
+                               min="0" step="1000" placeholder="0" required>
+                        <small class="form-text text-muted">Masukkan nominal dalam Rupiah</small>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"><?php echo $editData?'Update':'Simpan'; ?></button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                        <i class="fas fa-save mr-1"></i> Simpan
+                    </button>
                     <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
                 </div>
             </form>
@@ -229,17 +246,72 @@ include '../inc/sidebar.php';
 </div>
 
 <script>
-$(document).ready(function(){
-    <?php if($editData): ?>
-        $('#modal-transaksi-kas').modal('show');
-    <?php endif; ?>
+// Fungsi reset form
+function resetForm() {
+    document.getElementById('modalTitle').textContent = 'Tambah Transaksi';
+    document.getElementById('formAction').value = 'create';
+    document.getElementById('formId').value = '';
+    document.getElementById('formTransaksi').reset();
+    document.getElementById('formTanggal').value = '<?php echo date('Y-m-d') ?>';
+    document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-save mr-1"></i> Simpan';
+}
+
+// Fungsi untuk edit data
+function editData(btn) {
+    var id = btn.getAttribute('data-id');
+    var tanggal = btn.getAttribute('data-tanggal');
+    var deskripsi = btn.getAttribute('data-deskripsi');
+    var kategori = btn.getAttribute('data-kategori');
+    var akun = btn.getAttribute('data-akun');
+    var jumlah = btn.getAttribute('data-jumlah');
+
+    console.log('Edit clicked:', {id, tanggal, deskripsi, kategori, akun, jumlah});
+
+    // Set modal title dan action
+    document.getElementById('modalTitle').textContent = 'Edit Transaksi';
+    document.getElementById('formAction').value = 'update';
+    document.getElementById('formId').value = id;
     
+    // Isi form dengan data
+    document.getElementById('formTanggal').value = tanggal;
+    document.getElementById('formDeskripsi').value = deskripsi;
+    document.getElementById('formKategori').value = kategori;
+    document.getElementById('formAkun').value = akun;
+    document.getElementById('formJumlah').value = jumlah;
+    
+    // Ubah text button submit
+    document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-save mr-1"></i> Update';
+
+    // Show modal
+    $('#modal-transaksi-kas').modal('show');
+}
+
+$(document).ready(function(){
+    
+    // Validasi form sebelum submit
     $('#formTransaksi').on('submit', function(e){
         var jumlah = parseInt($('input[name="jumlah"]').val());
         if(jumlah <= 0){
             alert('Jumlah harus lebih besar dari 0');
             e.preventDefault();
+            return false;
         }
+    });
+
+    // Quick add button - trigger modal untuk tambah
+    $('#btn-quick-add').on('click', function(){
+        resetForm();
+        $('#modal-transaksi-kas').modal('show');
+    });
+
+    // Tombol tambah di header card
+    $('[data-target="#modal-transaksi-kas"]').on('click', function(){
+        resetForm();
+    });
+
+    // Reset form saat modal ditutup
+    $('#modal-transaksi-kas').on('hidden.bs.modal', function () {
+        resetForm();
     });
 });
 </script>
