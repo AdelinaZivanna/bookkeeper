@@ -108,6 +108,7 @@ $kontaks = kontak_all();
             <table class="table table-hover mb-0">
                 <thead class="thead-light">
                     <tr>
+                        <th>No</th>
                         <th>Nama</th>
                         <th>Jenis</th>
                         <th>Email</th>
@@ -120,6 +121,7 @@ $kontaks = kontak_all();
                     <?php if (!empty($kontaks)) : ?>
                         <?php foreach ($kontaks as $k): ?>
                             <tr>
+                                <td><?= htmlspecialchars($k['id']) ?></td>                
                                 <td><?= htmlspecialchars($k['nama']) ?></td>
                                 <td><?= htmlspecialchars($k['jenis']) ?></td>
                                 <td><?= htmlspecialchars($k['email']) ?></td>

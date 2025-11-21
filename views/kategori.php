@@ -106,6 +106,7 @@ if (isset($_GET['edit'])) {
         <table class="table table-hover mb-0">
             <thead class="thead-light">
                 <tr>
+                    <th>No</th>
                     <th>Nama</th>
                     <th>Jenis</th>
                     <th>PPN</th>
@@ -118,6 +119,7 @@ if (isset($_GET['edit'])) {
                 $kategori = kategori_all();
                 foreach ($kategori as $k): ?>
                     <tr>
+                        <td><?= htmlspecialchars($k['id']) ?></td>
                         <td><?= htmlspecialchars($k['nama']) ?></td>
                         <td><?= htmlspecialchars($k['jenis']) ?></td>
                         <td><?= htmlspecialchars($k['ppn']) ?></td>
