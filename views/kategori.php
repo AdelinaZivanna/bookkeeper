@@ -23,7 +23,7 @@ if (isset($_POST['update_category'])) {
         $_POST['id'],
         $_POST['nama'],
         $_POST['jenis'],
-        $_POST['ppn'] ?? 'Non PPN'
+        $_POST['PPN'] ?? 'Non PPN'
     );
 
     echo '<script>window.location.href = "kategori.php"</script>';

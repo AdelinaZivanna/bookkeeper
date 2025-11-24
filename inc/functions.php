@@ -481,20 +481,37 @@ function getAllAkunList($conn) {
     return mysqli_query($conn, "SELECT id, nama, jenis, saldoawal, mata_uang FROM akun ORDER BY nama ASC");
 }
 
-$history_sql = "
-    SELECT 'Transaksi' AS sumber, id, tanggal, deskripsi, kategori, akun, jumlah
-    FROM transaksi
-    UNION ALL
-    SELECT 'Kas Kecil' AS sumber, id, tanggal, deskripsi, kategori, akun, jumlah
-    FROM kaskecil
-    ORDER BY tanggal DESC, id DESC
-";
+
+
+
+
+
+
+// ======================
+function history_all($conn) {
+    $sql = "
+        SELECT 'Transaksi' AS sumber, id, tanggal, deskripsi, kategori, akun, jumlah
+        FROM transaksi
+        UNION ALL
+        SELECT 'Kas Kecil' AS sumber, id, tanggal, deskripsi, kategori, akun, jumlah
+        FROM kaskecil
+        ORDER BY tanggal DESC, id DESC
+    ";
+
+    return mysqli_query($conn, $sql);
+}
 
 function getTotalSaldo($conn) {
     $result = mysqli_query($conn, "SELECT SUM(saldoawal) AS total FROM akun");
     $row = mysqli_fetch_assoc($result);
     return (int)$row['total'];
 }
+
+
+
+
+
+
 
 // SHARED FALLBACKS
 if (!function_exists('getKategoriList')) {
