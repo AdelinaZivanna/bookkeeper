@@ -4,17 +4,19 @@ $page_title = "Dashboard";
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
+
+
+
 $page_title = "Dashboard";
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: ../index.php");
+    echo '<script>window.location.href = "../index.php"</script>';
     exit;
 }
 
-// ambil total saldo
-    $total_saldo = getTotalSaldo($conn);
-    $history = mysqli_query($conn, $history_sql);
-    $history_sql = "history_all()";
+
+$total_saldo = getTotalSaldo($conn);
+$history = history_all($conn);
 
 ?>
 
@@ -121,4 +123,4 @@ if (isset($_GET['logout'])) {
 </div>
 <!-- /DASHBOARD -->
 
-<?php include '../inc/footer.php'; ?>
+    <?php include '../inc/footer.php'; ?>
