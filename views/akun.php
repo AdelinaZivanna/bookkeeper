@@ -5,7 +5,7 @@ include '../inc/header.php';
 
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: ../index.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -31,6 +31,10 @@ if (isset($_GET['hapus'])) {
     exit;
 }
 
+$edit = null;
+if (isset($_GET['edit'])) {
+    $edit = GetAkun($_GET['edit']);
+}
 
 ?>
 
@@ -120,6 +124,11 @@ include '../inc/sidebar.php';
                                 <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
                                 <td>Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
                                 <td class="text-right">
+
+                                    <a href="akun.php?edit=<?= $a['id'] ?>" 
+                                    class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     <a href="akun.php?hapus=<?php echo $a['id']; ?>"
                                     onclick="return confirm('Hapus akun ini?')"
                                     class="btn btn-sm btn-danger">
