@@ -1,7 +1,6 @@
 <?php 
-include '../inc/config.php';
-include '../inc/functions.php';
 include '../inc/header.php';
+include '../inc/sidebar.php';
 
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -46,49 +45,6 @@ $akunList = getAkunKasList($conn);
 
 ?>
 
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link font-weight-bold">Dashboard</a>
-                </li>
-            </ul>
-
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item d-none d-md-block mr-2">
-                    <button id="btn-quick-add" class="btn btn-sm btn-primary"><i class="fas fa-plus mr-1"></i>
-                        Transaksi</button>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="toggle-dark" href="#" role="button" title="Tema Gelap/Terang"><i
-                            class="far fa-moon"></i></a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
-                        <i class="far fa-user"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <span class="dropdown-item-text">Signed in as<br><b>nuna@company.id</b></span>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" data-nav="#page-settings"><i class="fas fa-cog mr-2"></i>
-                            Pengaturan</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="?logout=1" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin keluar?')"> <i class="fas fa-sign-out-alt mr-2"></i> Keluar</a>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
-
-<?php 
-include '../inc/sidebar.php';
-?>
 
 <div class="container-fluid pt-2">
     <div class="card card-outline card-primary shadow-sm">
