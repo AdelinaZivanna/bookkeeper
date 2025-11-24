@@ -4,11 +4,6 @@ include '../inc/header.php';
 // include '../inc/functions.php';
 include '../inc/sidebar.php';
 
-if (isset($_GET['logout'])) {
-    session_destroy();
-    echo '<script>window.location.href = "../index.php"</script>';
-    exit;
-}
 
 if (isset($_POST['add_contact'])) {
     kontak_add(

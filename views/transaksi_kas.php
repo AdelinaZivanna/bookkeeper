@@ -1,18 +1,13 @@
 <?php 
+$page_title = "Transaksi Kas Kecil";
 include '../inc/header.php';
 include '../inc/sidebar.php';
-
-if (isset($_GET['logout'])) {
-    session_destroy();
-    echo '<script>window.location.href = "../index.php"</script>';
-    exit;
-}
 
 $page_title = "Kas Kecil"; 
 
 // Handle POST untuk Create/Update/Delete
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+
         $action = $_POST['action'];
         
         switch ($variable) {
@@ -30,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
         }
         
-        header("Location: " . $_SERVER['PHP_SELF']);
+        echo '<script>window.location.href = "transaksi_kas.php"</script>';
         exit;
     }
-}
+
 
 // Handle GET untuk Edit
 $editData = null;

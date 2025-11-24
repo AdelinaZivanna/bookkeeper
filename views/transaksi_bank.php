@@ -4,18 +4,12 @@ $page_title = "Transaksi Kas & Bank";
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
-if (isset($_GET['logout'])) {
-    session_destroy();
-    echo '<script>window.location.href = "../index.php"</script>';
-    exit;
-}
-
 // Handle POST untuk Create/Update/Delete
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+
         $action = $_POST['action'];
         
-        switch ($variable) {
+        switch ($action) {
             case 'create':
                 createKasKecil($conn, $_POST);
                 break;
@@ -30,10 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
         }
         
-        header("Location: " . $_SERVER['PHP_SELF']);
+        echo '<script>window.location.href = "transaksi_bank.php"</script>';
         exit;
     }
-}
+
 
 // Ambil semua data
 $result = getAllTransaksi($conn);
