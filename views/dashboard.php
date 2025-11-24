@@ -1,5 +1,6 @@
 <?php 
-// dashboard.php
+$page_title = "Dashboard"; 
+
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
@@ -14,7 +15,6 @@ if (isset($_GET['logout'])) {
     $total_saldo = getTotalSaldo($conn);
     $history = mysqli_query($conn, $history_sql);
     $history_sql = "history_all()";
-    $page_title = "Dashboard"; 
 
 ?>
 

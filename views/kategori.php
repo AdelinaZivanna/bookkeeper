@@ -1,4 +1,6 @@
 <?php 
+
+$page_title = "Kategori"; 
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
@@ -7,8 +9,6 @@ if (isset($_GET['logout'])) {
     header("Location: ../index.php");
     exit;
 }
-
-$page_title = "Kategori"; 
 
 if (isset($_POST['add_category'])) {
 

@@ -1,4 +1,5 @@
 <?php 
+$page_title = "Akun"; 
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
@@ -8,7 +9,6 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-$page_title = "Akun"; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
     $nama = $_POST['nama'];

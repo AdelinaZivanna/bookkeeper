@@ -1,4 +1,6 @@
 <?php 
+$page_title = "Kas Kecil"; 
+
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
@@ -7,8 +9,6 @@ if (isset($_GET['logout'])) {
     header("Location: ../index.php");
     exit;
 }
-
-$page_title = "Kas Kecil"; 
 
 // Handle POST untuk Create/Update/Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

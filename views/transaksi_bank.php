@@ -1,8 +1,8 @@
 <?php 
+$page_title = "Transaksi Kas & Bank"; 
+
 include '../inc/header.php';
 include '../inc/sidebar.php';
-
-$page_title = "Transaksi Kas & Bank"; 
 
 if (isset($_GET['logout'])) {
     session_destroy();
