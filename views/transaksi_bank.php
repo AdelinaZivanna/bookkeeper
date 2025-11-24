@@ -7,20 +7,20 @@ include '../inc/sidebar.php';
 // Handle POST untuk Create/Update/Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
-        $action = $_POST['action'];
+         $action = $_POST['action'];
         
         switch ($action) {
             case 'create':
-                createKasKecil($conn, $_POST);
+                createTransaksi($conn, $_POST);
                 break;
 
             case 'update':
-                updateKasKecil($conn, $_POST['id'], $_POST);
+                updateTransaksi($conn, $_POST['id'], $_POST);
                 break;
             
             default:
             if (isset($_POST['id']))
-                deleteKasKecil($conn, $_POST['id']);
+                deleteTransaksi($conn, $_POST['id']);
                 break;
         }
         
