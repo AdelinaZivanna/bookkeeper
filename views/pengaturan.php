@@ -4,12 +4,6 @@ $page_title = "Pengaturan";
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
-if (isset($_GET['logout'])) {
-    session_destroy();
-    echo '<script>window.location.href = "../index.php"</script>';
-    exit;
-}
-
 $set = settings_get();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

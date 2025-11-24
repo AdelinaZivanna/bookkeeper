@@ -4,12 +4,6 @@ $page_title = "Transaksi Kas & Bank";
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
-if (isset($_GET['logout'])) {
-    session_destroy();
-    echo '<script>window.location.href = "../index.php"</script>';
-    exit;
-}
-
 // Handle POST untuk Create/Update/Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {

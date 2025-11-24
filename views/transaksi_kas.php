@@ -2,12 +2,6 @@
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
-if (isset($_GET['logout'])) {
-    session_destroy();
-    echo '<script>window.location.href = "../index.php"</script>';
-    exit;
-}
-
 $page_title = "Kas Kecil"; 
 
 // Handle POST untuk Create/Update/Delete
