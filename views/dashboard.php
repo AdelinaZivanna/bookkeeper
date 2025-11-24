@@ -4,25 +4,17 @@ include '../inc/header.php';
 include '../inc/functions.php';
 
 $page_title = "Dashboard";
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: ../index.php");
+    exit;
+}
 
 // ambil total saldo
-$total_saldo = getTotalSaldo($conn);
-
-/* === TAMBAHAN: ambil history gabungan dari tabel transaksi + kaskecil (real-time view di dashboard) === */
-// Kita gabungkan kedua tabel agar dashboard menunjukkan semua transaksi dari kedua page.
-$history_sql = "
-    SELECT 'Transaksi' AS sumber, id, tanggal, deskripsi, kategori, akun, jumlah
-    FROM transaksi
-    UNION ALL
-    SELECT 'Kas Kecil' AS sumber, id, tanggal, deskripsi, kategori, akun, jumlah
-    FROM kaskecil
-    ORDER BY tanggal DESC, id DESC
-";
-/* === TAMBAHAN END === */
-
-$history = mysqli_query($conn, $history_sql);
-
-$page_title = "Dashboard"; 
+    $total_saldo = getTotalSaldo($conn);
+    $history = mysqli_query($conn, $history_sql);
+    $history_sql = "history_all()";
+    $page_title = "Dashboard"; 
 
 ?>
 
@@ -132,7 +124,6 @@ include '../inc/sidebar.php';
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <!-- Tampilan table serupa transaksi_bank.php -->
                 <table class="table table-hover mb-0" id="tbl-history">
                     <thead class="thead-light">
                         <tr>
@@ -141,7 +132,7 @@ include '../inc/sidebar.php';
                             <th>Kategori</th>
                             <th class="text-right">Jumlah</th>
                             <th>Akun</th>
-                            <th>Sumber</th> <!-- TAMBAHAN: kolom sumber (Transaksi / Kas Kecil) -->
+                            <th>Sumber</th> 
                         </tr>
                     </thead>
                     <tbody>
