@@ -1,6 +1,4 @@
 <?php 
-$page_title = "Kas Kecil"; 
-
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
@@ -10,19 +8,26 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
+$page_title = "Kas Kecil"; 
+
 // Handle POST untuk Create/Update/Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
         
-        if ($action === 'create') {
-            createKasKecil($conn, $_POST);
+        switch ($variable) {
+            case 'create':
+                createKasKecil($conn, $_POST);
+                break;
+
+            case 'update':
+                updateKasKecil($conn, $_POST['id'], $_POST);
+                break;
             
-        } elseif ($action === 'update') {
-            updateKasKecil($conn, $_POST['id'], $_POST);
-            
-        } elseif ($action === 'delete' && isset($_POST['id'])) {
-            deleteKasKecil($conn, $_POST['id']);
+            default:
+            if (isset($_POST['id']))
+                deleteKasKecil($conn, $_POST['id']);
+                break;
         }
         
         header("Location: " . $_SERVER['PHP_SELF']);

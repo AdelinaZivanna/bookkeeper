@@ -15,14 +15,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
         
-        if ($action === 'create') {
-            createTransaksi($conn, $_POST);
+        switch ($variable) {
+            case 'create':
+                createKasKecil($conn, $_POST);
+                break;
+
+            case 'update':
+                updateKasKecil($conn, $_POST['id'], $_POST);
+                break;
             
-        } elseif ($action === 'update') {
-            updateTransaksi($conn, $_POST['id'], $_POST);
-            
-        } elseif ($action === 'delete' && isset($_POST['id'])) {
-            deleteTransaksi($conn, $_POST['id']);
+            default:
+            if (isset($_POST['id']))
+                deleteKasKecil($conn, $_POST['id']);
+                break;
         }
         
         header("Location: " . $_SERVER['PHP_SELF']);
