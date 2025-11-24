@@ -1,4 +1,13 @@
 <?php
+
+function logout() {
+    if (isset($_GET['logout'])) {
+    session_destroy();
+    echo '<script>window.location.href = "../index.php"</script>';
+    exit;
+}
+
+}
 // -----------------------------
 // KONTAK
 // -----------------------------
