@@ -24,9 +24,6 @@ function kontak_delete($id) {
     return $stmt->execute();
 }
 
-// -----------------------------
-// KATEGORI
-// -----------------------------
 function kontak_get($id) {
     global $conn;
     $stmt = $conn->prepare("SELECT * FROM kontak WHERE id = ?");
@@ -41,6 +38,11 @@ function kontak_update($id, $nama, $jenis, $email, $telepon) {
     $stmt->bind_param("ssssi", $nama, $jenis, $email, $telepon, $id);
     return $stmt->execute();
 }
+
+// -----------------------------
+// KATEGORI
+// -----------------------------
+
 
 function kategori_all() {
     global $conn;
@@ -67,9 +69,6 @@ function kategori_delete($id) {
     return mysqli_query($conn, "DELETE FROM kategori WHERE id = $id");
 }
 
-// -----------------------------
-// AKUN
-// -----------------------------
 function kategori_get($id) {
     global $conn;
     $stmt = $conn->prepare("SELECT * FROM kategori WHERE id = ?");
@@ -85,6 +84,18 @@ function kategori_update($id, $nama, $jenis, $ppn) {
     return $stmt->execute();
 }
 
+// -----------------------------
+// AKUN
+// -----------------------------
+
+
+function GetAkun($id) {
+        global $conn;
+    $stmt = $conn->prepare("SELECT * FROM akun WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
 
 function akun_all() {
     global $conn;
