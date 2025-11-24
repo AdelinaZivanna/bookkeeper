@@ -5,7 +5,7 @@ include '../inc/header.php';
 
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
 
@@ -122,7 +122,7 @@ if (isset($_GET['edit'])) {
                         <td><?= htmlspecialchars($k['id']) ?></td>
                         <td><?= htmlspecialchars($k['nama']) ?></td>
                         <td><?= htmlspecialchars($k['jenis']) ?></td>
-                        <td><?= htmlspecialchars($k['ppn']) ?></td>
+                        <td><?= htmlspecialchars($k['PPN']) ?></td>
                         <td>
 
                             <a href="kategori.php?edit=<?= $k['id'] ?>" 

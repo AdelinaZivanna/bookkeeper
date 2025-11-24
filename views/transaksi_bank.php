@@ -7,7 +7,7 @@ $page_title = "Transaksi Kas & Bank";
 
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
 
