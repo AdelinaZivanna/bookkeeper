@@ -1,12 +1,12 @@
 <?php
 $page_title = "Kontak"; 
-
 include '../inc/header.php';
+// include '../inc/functions.php';
 include '../inc/sidebar.php';
 
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: ../index.php");
+    echo '<script>window.location.href = "../index.php"</script>';
     exit;
 }
 
@@ -18,7 +18,7 @@ if (isset($_POST['add_contact'])) {
         $_POST['telepon']
     );
 
-    header("Location: kontak.php");
+    echo '<script>window.location.href = "kontak.php"</script>';
     exit;
 }
 
@@ -31,13 +31,13 @@ if (isset($_POST['update_contact'])) {
         $_POST['telepon']
     );
 
-    header("Location: kontak.php");
+    echo '<script>window.location.href = "kontak.php"</script>';
     exit;
 }
 
 if (isset($_GET['delete'])) {
     kontak_delete($_GET['delete']);
-    header("Location: kontak.php");
+    echo '<script>window.location.href = "kontak.php"</script>';
     exit;
 }
 

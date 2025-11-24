@@ -1,11 +1,12 @@
 <?php 
 $page_title = "Akun"; 
+
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: index.php");
+    echo '<script>window.location.href = "../index.php"</script>';
     exit;
 }
 
@@ -42,7 +43,7 @@ if (isset($_GET['edit'])) {
 
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Akun Kas/Bank</h3>
-            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-account">
+            <button class="btn btn-primary ml-auto" data-toggle="modal" data-target="#modal-account">
                 <i class="fas fa-plus mr-1"></i> Akun
             </button>
         </div>
@@ -78,7 +79,7 @@ if (isset($_GET['edit'])) {
                                 <td><?php echo htmlspecialchars($a['jenis']); ?></td>
                                 <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
                                 <td>Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
-                                <td class="text-right">
+                                <td>
 
                                     <a href="akun.php?edit=<?= $a['id'] ?>" 
                                     class="btn btn-sm btn-warning">

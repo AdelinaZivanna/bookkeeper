@@ -6,7 +6,7 @@ include '../inc/sidebar.php';
 
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: ../index.php");
+    echo '<script>window.location.href = "../index.php"</script>';
     exit;
 }
 
@@ -18,7 +18,7 @@ if (isset($_POST['add_category'])) {
         $_POST['ppn'] ?? 'Non PPN'
     );
 
-    header("Location: kategori.php");
+    echo '<script>window.location.href = "kategori.php"</script>';
     exit;
 }
 
@@ -31,13 +31,13 @@ if (isset($_POST['update_category'])) {
         $_POST['ppn'] ?? 'Non PPN'
     );
 
-    header("Location: kategori.php");
+    echo '<script>window.location.href = "kategori.php"</script>';
     exit;
 }
 
 if (isset($_GET['hapus'])) {
     kategori_delete(intval($_GET['hapus']));
-    header("Location: kategori.php");
+    echo '<script>window.location.href = "kategori.php"</script>';
     exit;
 }
 

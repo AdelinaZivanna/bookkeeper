@@ -1,7 +1,4 @@
 <?php
-// inc/functions.php
-include 'config.php'; // pastikan path benar: inc/config.php
-
 // -----------------------------
 // KONTAK
 // -----------------------------
