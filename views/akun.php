@@ -1,9 +1,8 @@
-<?php 
+z<?php 
 $page_title = "Akun"; 
 
 include '../inc/header.php';
 include '../inc/sidebar.php';
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
     $nama = $_POST['nama'];
@@ -13,15 +12,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
 
     akun_add($nama, $jenis, $mata_uang, $saldo_awal);
 
-    header("Location: akun.php");
+    echo '<script>window.location.href = "akun.php"</script>';
     exit;
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_account'])) {
+    $id = $_POST['id'];
+    $nama = $_POST['nama'];
+    $jenis = $_POST['jenis'];
+    $mata_uang = $_POST['mata_uang'];
+    $saldo_awal = $_POST['saldo_awal'] ?? 0;
+
+    akun_update($id, $nama, $jenis, $mata_uang, $saldo_awal);
+
+    echo '<script>window.location.href = "akun.php"</script>';
+    exit;
+}
+
 
 if (isset($_GET['hapus'])) {
     $id = intval($_GET['hapus']);
     akun_delete($id);
 
-    header("Location: akun.php");
+    echo '<script>window.location.href = "akun.php"</script>';
     exit;
 }
 
