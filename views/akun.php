@@ -1,161 +1,216 @@
 <?php 
+$page_title = "Akun"; 
 
-$page_title = "Kategori"; 
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
-if (isset($_POST['add_category'])) {
-    kategori_add(
-        $_POST['nama'],
-        $_POST['jenis'],
-        $_POST['ppn'] ?? 'Non PPN'
-    );
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
+    $nama = $_POST['nama'];
+    $jenis = $_POST['jenis'];
+    $mata_uang = $_POST['mata_uang'] ?? 'IDR';
+    $saldo_awal = $_POST['saldo_awal'] ?? 0;
 
-    echo '<script>window.location.href = "kategori.php"</script>';
+    akun_add($nama, $jenis, $mata_uang, $saldo_awal);
+
+    echo '<script>window.location.href = "akun.php"</script>';
     exit;
 }
 
-if (isset($_POST['update_category'])) {
-    kategori_update(
-        $_POST['id'],
-        $_POST['nama'],
-        $_POST['jenis'],
-        $_POST['ppn'] ?? 'Non PPN'
-    );
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_account'])) {
+    $id         = $_POST['id'];
+    $nama       = $_POST['nama'];
+    $jenis      = $_POST['jenis'];
+    $mata_uang  = $_POST['mata_uang'];
+    $saldo_awal = $_POST['saldo_awal'] ?? 0;
 
-    echo '<script>window.location.href = "kategori.php"</script>';
+    akun_update($id, $nama, $jenis, $mata_uang, $saldo_awal);
+
+    echo '<script>window.location.href = "akun.php"</script>';
     exit;
 }
 
 if (isset($_GET['hapus'])) {
-    kategori_delete(intval($_GET['hapus']));
-    echo '<script>window.location.href = "kategori.php"</script>';
+    $id = intval($_GET['hapus']);
+    akun_delete($id);
+
+    echo '<script>window.location.href = "akun.php"</script>';
     exit;
 }
 
 $edit = null;
 if (isset($_GET['edit'])) {
-    $edit = kategori_get($_GET['edit']);
+    $edit = GetAkun($_GET['edit']);
 }
 ?>
 
-<div class="card card-outline card-primary shadow-sm">
-    <div class="card-header d-flex justify-content-between">
-        <h3 class="card-title">Kategori</h3>
-        <button class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#modal-category">
-            <i class="fas fa-plus"></i> Kategori
-        </button>
-    </div>
-    <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead class="thead-light">
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>Jenis</th>
-                    <th>PPN</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                $kategori = kategori_all();
-                foreach ($kategori as $k): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($k['id']) ?></td>
-                        <td><?= htmlspecialchars($k['nama']) ?></td>
-                        <td><?= htmlspecialchars($k['jenis']) ?></td>
-                        <td><?= htmlspecialchars($k['PPN']) ?></td>
-                        <td>
-                            <a href="kategori.php?edit=<?= $k['id'] ?>" 
-                               class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="kategori.php?hapus=<?= $k['id'] ?>"
-                               onclick="return confirm('Hapus kategori?')"
-                               class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                <?php endforeach ?>
-            </tbody>
-        </table>
+<div id="page-accounts">
+    <div class="card card-outline card-primary shadow-sm">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Akun Kas/Bank</h3>
+            <button class="btn btn-primary ml-auto" data-toggle="modal" data-target="#modal-account">
+                <i class="fas fa-plus mr-1"></i> Akun
+            </button>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Jenis</th>
+                            <th>Mata Uang</th>
+                            <th>Saldo Awal</th>
+                            <th>Total Pengeluaran</th>
+                            <th>Saldo Akhir</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php 
+                        $akun = akun_all();
+                        
+                        foreach ($akun as $a): 
+                            $total_pengeluaran = getTotalPengeluaranByAkun($conn, $a['nama']);
+                            $saldoakhir = $a['saldoawal'] - $total_pengeluaran;
+                        ?>
+                            <tr>
+                                <td><?= htmlspecialchars($a['id']); ?></td>
+                                <td><?= htmlspecialchars($a['nama']); ?></td>
+                                <td><?= htmlspecialchars($a['jenis']); ?></td>
+                                <td><?= htmlspecialchars($a['mata_uang']); ?></td>
+                                <td>Rp <?= number_format($a['saldoawal'], 0, ',', '.'); ?></td>
+                                <td class="text-danger">- Rp <?= number_format($total_pengeluaran, 0, ',', '.'); ?></td>
+                                <td class="font-weight-bold">Rp <?= number_format($saldoakhir, 0, ',', '.'); ?></td>
+                                <td>
+                                    <a href="akun.php?edit=<?= $a['id'] ?>" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="akun.php?hapus=<?= $a['id']; ?>"
+                                    onclick="return confirm('Hapus akun ini?')"
+                                    class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
 
-<div class="modal fade <?php echo $edit ? 'show' : '' ?>"
-     id="modal-category"
-     tabindex="-1"
-     aria-hidden="true"
-     style="<?php echo $edit ? 'display:block; background:rgba(0,0,0,.5);' : '' ?>">
+<div class="modal fade" id="modal-account" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="POST">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        <?= $edit ? 'Edit Kategori' : 'Tambah Kategori' ?>
-                    </h5>
-                    <a href="kategori.php" class="close">&times;</a>
+                    <h5 class="modal-title">Tambah Akun</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
+
                 <div class="modal-body">
-
-                    <?php if ($edit): ?>
-                        <input type="hidden" name="id" value="<?= $edit['id'] ?>">
-                    <?php endif ?>
-
                     <div class="form-row">
                         <div class="form-group col-md-8">
-                            <label>Nama</label>
-                            <input type="text" name="nama" class="form-control"
-                                   value="<?= $edit ? htmlspecialchars($edit['nama']) : '' ?>"
-                                   required>
+                            <label>Nama Akun <span class="text-danger">*</span></label>
+                            <input type="text" name="nama" class="form-control" required>
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label>Jenis</label>
-                            <select name="jenis" class="custom-select">
-                                <option value="Pendapatan" 
-                                    <?= ($edit && $edit['jenis']=='Pendapatan')?'selected':'' ?>>
-                                    Pendapatan
-                                </option>
-                                <option value="Biaya" 
-                                    <?= ($edit && $edit['jenis']=='Biaya')?'selected':'' ?>>
-                                    Biaya
-                                </option>
-                                <option value="Lainnya" 
-                                    <?= ($edit && $edit['jenis']=='Lainnya')?'selected':'' ?>>
-                                    Lainnya
-                                </option>
+                            <label>Jenis <span class="text-danger">*</span></label>
+                            <select name="jenis" class="custom-select" required>
+                                <option value="Kas">Kas</option>
+                                <option value="Bank">Bank</option>
+                                <option value="Clearing">Clearing</option>
+                                <option value="Petty">Petty</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>PPN</label>
-                        <select name="ppn" class="custom-select">
-                            <option value="Non PPN" 
-                                <?= ($edit && $edit['PPN']=='Non PPN')?'selected':'' ?>>
-                                Non PPN
-                            </option>
-                            <option value="PPN 11%" 
-                                <?= ($edit && $edit['PPN']=='PPN 11%')?'selected':'' ?>>
-                                PPN 11%
-                            </option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Mata Uang</label>
+                            <select name="mata_uang" class="custom-select">
+                                <option value="IDR">IDR</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Saldo Awal</label>
+                            <input type="number" name="saldo_awal" class="form-control" min="0" step="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="add_account" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php if ($edit): ?>
+<div class="modal fade show" id="modal-edit" tabindex="-1" style="display:block; background:rgba(0,0,0,.5)">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="POST">
+                <input type="hidden" name="id" value="<?= $edit['id'] ?>">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Akun</h5>
+                    <a href="akun.php" class="close">&times;</a>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label>Nama Akun</label>
+                            <input type="text" name="nama" class="form-control"
+                                   value="<?= $edit['nama'] ?>" required>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label>Jenis</label>
+                            <select name="jenis" class="custom-select" required>
+                                <option value="Kas" <?= $edit['jenis']=='Kas'?'selected':'' ?>>Kas</option>
+                                <option value="Bank" <?= $edit['jenis']=='Bank'?'selected':'' ?>>Bank</option>
+                                <option value="Clearing" <?= $edit['jenis']=='Clearing'?'selected':'' ?>>Clearing</option>
+                                <option value="Petty" <?= $edit['jenis']=='Petty'?'selected':'' ?>>Petty</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Mata Uang</label>
+                            <select name="mata_uang" class="custom-select">
+                                <option value="IDR" <?= $edit['mata_uang']=='IDR'?'selected':'' ?>>IDR</option>
+                                <option value="USD" <?= $edit['mata_uang']=='USD'?'selected':'' ?>>USD</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Saldo Awal</label>
+                            <input type="number" name="saldo_awal" class="form-control"
+                                   value="<?= $edit['saldoawal'] ?>" min="0">
+                        </div>
                     </div>
 
                 </div>
 
                 <div class="modal-footer">
-
-                    <?php if ($edit): ?>
-                        <button type="submit" name="update_category" class="btn btn-warning">Update</button>
-                        <a href="kategori.php" class="btn btn-secondary">Batal</a>
-                    <?php else: ?>
-                        <button type="submit" name="add_category" class="btn btn-primary">Simpan</button>
-                    <?php endif ?>
-
+                    <button type="submit" name="update_account" class="btn btn-warning">Update</button>
+                    <a href="akun.php" class="btn btn-secondary">Batal</a>
                 </div>
 
             </form>
@@ -164,12 +219,10 @@ if (isset($_GET['edit'])) {
     </div>
 </div>
 
-<?php if ($edit): ?>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    $('#modal-category').modal('show');
-});
+    $('#modal-edit').modal('show');
 </script>
 <?php endif; ?>
 
-<?php include '../inc/footer.php'; ?> 
+
+<?php include '../inc/footer.php'; ?>
