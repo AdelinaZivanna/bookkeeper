@@ -26,7 +26,7 @@ $history = history_all($conn);
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="small-box bg-white shadow-sm">
                 <div class="inner">
-                    <h3 id="kpi-cash">Rp <?= number_format($total_saldo, 0, ',', '.'); ?></h3>
+                    <h3 id="kpi-cash">Rp <?= $total_saldo; ?></h3>
                    
                     <p>Saldo Kas & Bank</p>
                 </div>
