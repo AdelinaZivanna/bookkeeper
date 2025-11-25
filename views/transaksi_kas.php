@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         $action = $_POST['action'];
         
-        switch ($variable) {
+        switch ($action) {
             case 'create':
                 createKasKecil($conn, $_POST);
                 break;
@@ -193,7 +193,16 @@ $akunList = getAkunKasList($conn);
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label class="required">Tipe</label>
+                            <select class="custom-select" name="tipe" id="formTipe" required>
+                                <option value="pengeluaran">Pengeluaran</option>
+                                <option value="pemasukan">Pemasukan</option>
+                            </select>
+                        </div>
+
+                    <div class="form-group col-6">
                         <label class="required">Jumlah</label>
                         <input type="number" class="form-control" name="jumlah" id="formJumlah"
                                min="0" step="1000" placeholder="0" required>
@@ -245,6 +254,8 @@ function editData(btn) {
     document.getElementById('formKategori').value = kategori;
     document.getElementById('formAkun').value = akun;
     document.getElementById('formJumlah').value = jumlah;
+    document.getElementById('formTipe').value = (parseInt(jumlah) < 0) ? 'pengeluaran' : 'pemasukan';
+
     
     // Ubah text button submit
     document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-save mr-1"></i> Update';

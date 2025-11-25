@@ -10,7 +10,7 @@ if (isset($_POST['add_category'])) {
     kategori_add(
         $_POST['nama'],
         $_POST['jenis'],
-        $_POST['ppn'] ?? 'Non PPN'
+        $_POST['PPN'] ?? 'Non PPN'
     );
 
     echo '<script>window.location.href = "kategori.php"</script>';
@@ -68,7 +68,7 @@ if (isset($_GET['edit'])) {
                         <td><?= htmlspecialchars($k['id']) ?></td>
                         <td><?= htmlspecialchars($k['nama']) ?></td>
                         <td><?= htmlspecialchars($k['jenis']) ?></td>
-                        <td><?= htmlspecialchars($k['ppn']) ?></td>
+                        <td><?= htmlspecialchars($k['PPN']) ?></td>
                         <td>
                             <a href="kategori.php?edit=<?= $k['id'] ?>" 
                                class="btn btn-sm btn-warning">
@@ -134,11 +134,11 @@ if (isset($_GET['edit'])) {
                         <label>PPN</label>
                         <select name="ppn" class="custom-select">
                             <option value="Non PPN" 
-                                <?= ($edit && $edit['ppn']=='Non PPN')?'selected':'' ?>>
+                                <?= ($edit && $edit['PPN']=='Non PPN')?'selected':'' ?>>
                                 Non PPN
                             </option>
                             <option value="PPN 11%" 
-                                <?= ($edit && $edit['ppn']=='PPN 11%')?'selected':'' ?>>
+                                <?= ($edit && $edit['PPN']=='PPN 11%')?'selected':'' ?>>
                                 PPN 11%
                             </option>
                         </select>
