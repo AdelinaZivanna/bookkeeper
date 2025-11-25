@@ -81,9 +81,9 @@ if (isset($_GET['edit'])) {
                                 <td><?php echo htmlspecialchars($a['nama']); ?></td>
                                 <td><?php echo htmlspecialchars($a['jenis']); ?></td>
                                 <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
-                                <td class="text-right">Rp <?php echo number_format($a['saldoawal'], 0, ',', '.'); ?></td>
-                                <td class="text-right text-danger">- Rp <?php echo number_format($total_pengeluaran, 0, ',', '.'); ?></td>
-                                <td class="text-right font-weight-bold">Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
+                                <td>Rp <?php echo number_format($a['saldoawal'], 0, ',', '.'); ?></td>
+                                <td class="text-danger">- Rp <?php echo number_format($total_pengeluaran, 0, ',', '.'); ?></td>
+                                <td class="font-weight-bold">Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
                                 <td>
                                     <a href="akun.php?edit=<?= $a['id'] ?>" 
                                     class="btn btn-sm btn-warning">
