@@ -136,7 +136,23 @@ function akun_delete($id) {
     return $stmt->execute();
 }
 
-
+function getTotalPengeluaranByAkun($conn, $nama_akun) {
+    $total = 0;
+    
+    $sql_bank = "SELECT SUM(jumlah) as total FROM transaksi WHERE akun = '" . mysqli_real_escape_string($conn, $nama_akun) . "'";
+    $result_bank = mysqli_query($conn, $sql_bank);
+    if ($row_bank = mysqli_fetch_assoc($result_bank)) {
+        $total += $row_bank['total'] ?? 0;
+    }
+    
+    $sql_kas = "SELECT SUM(jumlah) as total FROM kaskecil WHERE akun = '" . mysqli_real_escape_string($conn, $nama_akun) . "'";
+    $result_kas = mysqli_query($conn, $sql_kas);
+    if ($row_kas = mysqli_fetch_assoc($result_kas)) {
+        $total += $row_kas['total'] ?? 0;
+    }
+    
+    return $total;
+}
 
 // -----------------------------
 // SETTINGS

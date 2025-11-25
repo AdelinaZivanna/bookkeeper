@@ -31,7 +31,6 @@ if (isset($_POST['update_account'])) {
     exit;
 }
 
-
 if (isset($_GET['hapus'])) {
     akun_delete(intval($_GET['hapus']));
     echo '<script>window.location.href = "akun.php"</script>';
@@ -58,6 +57,52 @@ $add = isset($_GET['add']);
         </div>
 
         <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nama</th>
+                            <th>Jenis</th>
+                            <th>Mata Uang</th>
+                            <th>Saldo Awal</th>
+                            <th>Total Pengeluaran</th>
+                            <th>Saldo Akhir</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php 
+                        $akun = akun_all();
+                        
+                        foreach ($akun as $a): 
+                            $total_pengeluaran = getTotalPengeluaranByAkun($conn, $a['nama']);
+                            $saldoakhir = $a['saldoawal'] - $total_pengeluaran;
+                        ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($a['nama']); ?></td>
+                                <td><?php echo htmlspecialchars($a['jenis']); ?></td>
+                                <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
+                                <td class="text-right">Rp <?php echo number_format($a['saldoawal'], 0, ',', '.'); ?></td>
+                                <td class="text-right text-danger">- Rp <?php echo number_format($total_pengeluaran, 0, ',', '.'); ?></td>
+                                <td class="text-right font-weight-bold">Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
+                                <td>
+                                    <a href="akun.php?edit=<?= $a['id'] ?>" 
+                                    class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="akun.php?hapus=<?php echo $a['id']; ?>"
+                                    onclick="return confirm('Hapus akun ini?')"
+                                    class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+
+                </table>
+            </div>
             <table class="table table-hover mb-0">
                 <thead class="thead-light">
                     <tr>
