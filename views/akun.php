@@ -1,4 +1,4 @@
-z<?php 
+<?php 
 $page_title = "Akun"; 
 
 include '../inc/header.php';
@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_account'])) {
     echo '<script>window.location.href = "akun.php"</script>';
     exit;
 }
-
 
 if (isset($_GET['hapus'])) {
     $id = intval($_GET['hapus']);
@@ -63,7 +62,9 @@ if (isset($_GET['edit'])) {
                             <th>Nama</th>
                             <th>Jenis</th>
                             <th>Mata Uang</th>
-                            <th>Saldo</th>
+                            <th>Saldo Awal</th>
+                            <th>Total Pengeluaran</th>
+                            <th>Saldo Akhir</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -71,23 +72,19 @@ if (isset($_GET['edit'])) {
                     <tbody>
                         <?php 
                         $akun = akun_all();
-                        $transaksi_kas = getAllKasKecil($conn);
-                        
-                        $total_pengeluaran = 0;
-                        while ($transaksi = mysqli_fetch_assoc($transaksi_kas)) {
-                            $total_pengeluaran += $transaksi['jumlah'];
-                        }
                         
                         foreach ($akun as $a): 
+                            $total_pengeluaran = getTotalPengeluaranByAkun($conn, $a['nama']);
                             $saldoakhir = $a['saldoawal'] - $total_pengeluaran;
                         ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($a['nama']); ?></td>
                                 <td><?php echo htmlspecialchars($a['jenis']); ?></td>
                                 <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
-                                <td>Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
+                                <td class="text-right">Rp <?php echo number_format($a['saldoawal'], 0, ',', '.'); ?></td>
+                                <td class="text-right text-danger">- Rp <?php echo number_format($total_pengeluaran, 0, ',', '.'); ?></td>
+                                <td class="text-right font-weight-bold">Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
                                 <td>
-
                                     <a href="akun.php?edit=<?= $a['id'] ?>" 
                                     class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
