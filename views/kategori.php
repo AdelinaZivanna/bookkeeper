@@ -4,13 +4,11 @@ $page_title = "Kategori";
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
-
 if (isset($_POST['add_category'])) {
-
     kategori_add(
         $_POST['nama'],
         $_POST['jenis'],
-        $_POST['PPN'] ?? 'Non PPN'
+        $_POST['ppn'] ?? 'Non PPN'
     );
 
     echo '<script>window.location.href = "kategori.php"</script>';
@@ -18,12 +16,11 @@ if (isset($_POST['add_category'])) {
 }
 
 if (isset($_POST['update_category'])) {
-
     kategori_update(
         $_POST['id'],
         $_POST['nama'],
         $_POST['jenis'],
-        $_POST['PPN'] ?? 'Non PPN'
+        $_POST['ppn'] ?? 'Non PPN'
     );
 
     echo '<script>window.location.href = "kategori.php"</script>';
@@ -86,6 +83,7 @@ if (isset($_GET['edit'])) {
         </table>
     </div>
 </div>
+
 <div class="modal fade <?php echo $edit ? 'show' : '' ?>"
      id="modal-category"
      tabindex="-1"
@@ -101,9 +99,11 @@ if (isset($_GET['edit'])) {
                     <a href="kategori.php" class="close">&times;</a>
                 </div>
                 <div class="modal-body">
+
                     <?php if ($edit): ?>
                         <input type="hidden" name="id" value="<?= $edit['id'] ?>">
                     <?php endif ?>
+
                     <div class="form-row">
                         <div class="form-group col-md-8">
                             <label>Nama</label>
@@ -111,20 +111,21 @@ if (isset($_GET['edit'])) {
                                    value="<?= $edit ? htmlspecialchars($edit['nama']) : '' ?>"
                                    required>
                         </div>
+
                         <div class="form-group col-md-4">
                             <label>Jenis</label>
                             <select name="jenis" class="custom-select">
                                 <option value="Pendapatan" 
                                     <?= ($edit && $edit['jenis']=='Pendapatan')?'selected':'' ?>>
-                                        Pendapatan
+                                    Pendapatan
                                 </option>
                                 <option value="Biaya" 
                                     <?= ($edit && $edit['jenis']=='Biaya')?'selected':'' ?>>
-                                        Biaya
+                                    Biaya
                                 </option>
                                 <option value="Lainnya" 
                                     <?= ($edit && $edit['jenis']=='Lainnya')?'selected':'' ?>>
-                                        Lainnya
+                                    Lainnya
                                 </option>
                             </select>
                         </div>
@@ -171,4 +172,4 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <?php endif; ?>
 
-<?php include '../inc/footer.php'; ?>
+<?php include '../inc/footer.php'; ?> 
