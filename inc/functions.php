@@ -46,9 +46,8 @@ function kontak_update($id, $nama, $jenis, $email, $telepon) {
 }
 
 // -----------------------------
-// KATEGORI
+//  KATEGORI
 // -----------------------------
-
 
 function kategori_all() {
     global $conn;
@@ -62,10 +61,10 @@ function kategori_all() {
     return $data;
 }
 
-function kategori_add($nama, $jenis, $ppn) {
+function kategori_add($nama, $jenis, $PPN) {
     global $conn;
-    $stmt = $conn->prepare("INSERT INTO kategori (nama, jenis, ppn) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $nama, $jenis, $ppn);
+    $stmt = $conn->prepare("INSERT INTO kategori (nama, jenis, PPN) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $nama, $jenis, $PPN);
     return $stmt->execute();
 }
 
@@ -83,12 +82,13 @@ function kategori_get($id) {
     return $stmt->get_result()->fetch_assoc();
 }
 
-function kategori_update($id, $nama, $jenis, $ppn) {
+function kategori_update($id, $nama, $jenis, $PPN) {
     global $conn;
-    $stmt = $conn->prepare("UPDATE kategori SET nama=?, jenis=?, ppn=? WHERE id=?");
-    $stmt->bind_param("sssi", $nama, $jenis, $ppn, $id);
+    $stmt = $conn->prepare("UPDATE kategori SET nama=?, jenis=?, PPN=? WHERE id=?");
+    $stmt->bind_param("sssi", $nama, $jenis, $PPN, $id);
     return $stmt->execute();
 }
+
 
 // -----------------------------
 // AKUN
