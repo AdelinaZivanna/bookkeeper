@@ -118,7 +118,14 @@ function akun_all() {
 function akun_add($nama, $jenis, $mata_uang, $saldoawal) {
     global $conn;
     $stmt = $conn->prepare("INSERT INTO akun (nama, jenis, mata_uang, saldoawal) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nama, $jenis, $mata_uang, $saldoawal);
+    $stmt->bind_param("sssi", $nama, $jenis, $mata_uang, $saldoawal);
+    return $stmt->execute();
+}
+
+function akun_update($id, $nama, $jenis, $mata_uang, $saldoawal) {
+    global $conn;
+    $stmt = $conn->prepare("UPDATE akun SET nama=?, jenis=?, mata_uang=?, saldoawal=? WHERE id=?");
+    $stmt->bind_param("sssii", $nama, $jenis, $mata_uang, $saldoawal, $id);
     return $stmt->execute();
 }
 
@@ -128,6 +135,8 @@ function akun_delete($id) {
     $stmt->bind_param("i", $id);
     return $stmt->execute();
 }
+
+
 
 // -----------------------------
 // SETTINGS
