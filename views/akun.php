@@ -4,6 +4,9 @@ $page_title = "Akun";
 include '../inc/header.php';
 include '../inc/sidebar.php';
 
+// -------------------------------
+// TAMBAH AKUN
+// -------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
     $nama = $_POST['nama'];
     $jenis = $_POST['jenis'];
@@ -16,11 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
     exit;
 }
 
+// -------------------------------
+// UPDATE AKUN
+// -------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_account'])) {
-    $id = $_POST['id'];
-    $nama = $_POST['nama'];
-    $jenis = $_POST['jenis'];
-    $mata_uang = $_POST['mata_uang'];
+    $id         = $_POST['id'];
+    $nama       = $_POST['nama'];
+    $jenis      = $_POST['jenis'];
+    $mata_uang  = $_POST['mata_uang'];
     $saldo_awal = $_POST['saldo_awal'] ?? 0;
 
     akun_update($id, $nama, $jenis, $mata_uang, $saldo_awal);
@@ -29,6 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_account'])) {
     exit;
 }
 
+// -------------------------------
+// HAPUS AKUN
+// -------------------------------
 if (isset($_GET['hapus'])) {
     $id = intval($_GET['hapus']);
     akun_delete($id);
@@ -37,11 +46,13 @@ if (isset($_GET['hapus'])) {
     exit;
 }
 
+// -------------------------------
+// EDIT MODE - GET DATA
+// -------------------------------
 $edit = null;
 if (isset($_GET['edit'])) {
     $edit = GetAkun($_GET['edit']);
 }
-
 ?>
 
 <div id="page-accounts">
@@ -59,6 +70,7 @@ if (isset($_GET['edit'])) {
                 <table class="table table-hover mb-0">
                     <thead class="thead-light">
                         <tr>
+                            <th>No</th>
                             <th>Nama</th>
                             <th>Jenis</th>
                             <th>Mata Uang</th>
@@ -78,18 +90,18 @@ if (isset($_GET['edit'])) {
                             $saldoakhir = $a['saldoawal'] - $total_pengeluaran;
                         ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($a['nama']); ?></td>
-                                <td><?php echo htmlspecialchars($a['jenis']); ?></td>
-                                <td><?php echo htmlspecialchars($a['mata_uang']); ?></td>
-                                <td>Rp <?php echo number_format($a['saldoawal'], 0, ',', '.'); ?></td>
-                                <td class="text-danger">- Rp <?php echo number_format($total_pengeluaran, 0, ',', '.'); ?></td>
-                                <td class="font-weight-bold">Rp <?php echo number_format($saldoakhir, 0, ',', '.'); ?></td>
+                                <td><?= htmlspecialchars($a['id']); ?></td>
+                                <td><?= htmlspecialchars($a['nama']); ?></td>
+                                <td><?= htmlspecialchars($a['jenis']); ?></td>
+                                <td><?= htmlspecialchars($a['mata_uang']); ?></td>
+                                <td>Rp <?= number_format($a['saldoawal'], 0, ',', '.'); ?></td>
+                                <td class="text-danger">- Rp <?= number_format($total_pengeluaran, 0, ',', '.'); ?></td>
+                                <td class="font-weight-bold">Rp <?= number_format($saldoakhir, 0, ',', '.'); ?></td>
                                 <td>
-                                    <a href="akun.php?edit=<?= $a['id'] ?>" 
-                                    class="btn btn-sm btn-warning">
+                                    <a href="akun.php?edit=<?= $a['id'] ?>" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="akun.php?hapus=<?php echo $a['id']; ?>"
+                                    <a href="akun.php?hapus=<?= $a['id']; ?>"
                                     onclick="return confirm('Hapus akun ini?')"
                                     class="btn btn-sm btn-danger">
                                         <i class="fas fa-trash"></i>
@@ -106,7 +118,10 @@ if (isset($_GET['edit'])) {
     </div>
 </div>
 
-<!-- Account Modal -->
+
+<!-- ===================================================== -->
+<!--                  MODAL TAMBAH AKUN                    -->
+<!-- ===================================================== -->
 <div class="modal fade" id="modal-account" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -151,14 +166,84 @@ if (isset($_GET['edit'])) {
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" name="add_account" class="btn btn-primary">
-                        Simpan
-                    </button>
+                    <button type="submit" name="add_account" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<!-- /Account Modal -->
+
+
+
+<!-- ===================================================== -->
+<!--                    MODAL EDIT AKUN                    -->
+<!-- ===================================================== -->
+<?php if ($edit): ?>
+<div class="modal fade show" id="modal-edit" tabindex="-1" style="display:block; background:rgba(0,0,0,.5)">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="POST">
+                <input type="hidden" name="id" value="<?= $edit['id'] ?>">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Akun</h5>
+                    <a href="akun.php" class="close">&times;</a>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label>Nama Akun</label>
+                            <input type="text" name="nama" class="form-control"
+                                   value="<?= $edit['nama'] ?>" required>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label>Jenis</label>
+                            <select name="jenis" class="custom-select" required>
+                                <option value="Kas" <?= $edit['jenis']=='Kas'?'selected':'' ?>>Kas</option>
+                                <option value="Bank" <?= $edit['jenis']=='Bank'?'selected':'' ?>>Bank</option>
+                                <option value="Clearing" <?= $edit['jenis']=='Clearing'?'selected':'' ?>>Clearing</option>
+                                <option value="Petty" <?= $edit['jenis']=='Petty'?'selected':'' ?>>Petty</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Mata Uang</label>
+                            <select name="mata_uang" class="custom-select">
+                                <option value="IDR" <?= $edit['mata_uang']=='IDR'?'selected':'' ?>>IDR</option>
+                                <option value="USD" <?= $edit['mata_uang']=='USD'?'selected':'' ?>>USD</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Saldo Awal</label>
+                            <input type="number" name="saldo_awal" class="form-control"
+                                   value="<?= $edit['saldoawal'] ?>" min="0">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="update_account" class="btn btn-warning">Update</button>
+                    <a href="akun.php" class="btn btn-secondary">Batal</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#modal-edit').modal('show');
+</script>
+<?php endif; ?>
+
 
 <?php include '../inc/footer.php'; ?>
