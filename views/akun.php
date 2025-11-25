@@ -43,6 +43,8 @@ if (isset($_GET['edit'])) {
     $edit = GetAkun($_GET['edit']);
 }
 
+$add = isset($_GET['add']);
+    
 ?>
 
 <div id="page-accounts">
@@ -104,10 +106,10 @@ if (isset($_GET['edit'])) {
 </div>
 
 
-<div class="modal fade <?= $edit ? 'show' : '' ?>" 
+<div class="modal fade <?= ($edit || $add) ? 'show' : '' ?>" 
      id="modal-account" 
      tabindex="-1" aria-hidden="true"
-     style="<?= $edit ? 'display:block; background:rgba(0,0,0,.5);' : '' ?>">
+     style="<?= ($edit || $add) ? 'display:block; background:rgba(0,0,0,.5);' : '' ?>">
 
     <div class="modal-dialog">
         <div class="modal-content">
@@ -115,7 +117,7 @@ if (isset($_GET['edit'])) {
 
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <?= $edit ? 'Edit Akun' : 'Tambah Akun' ?>
+                        <?= ($edit) ? 'Edit Akun' : 'Tambah Akun' ?>
                     </h5>
                     <a href="akun.php" class="close">&times;</a>
                 </div>
@@ -153,7 +155,7 @@ if (isset($_GET['edit'])) {
                         <div class="form-group col-md-6">
                             <label>Mata Uang</label>
                             <select name="mata_uang" class="custom-select">
-                                <option value="IDR" <?= ($edit && $edit['mata_uang']=='IDR')?'selected':'' ?>>IDR</option>
+                                <option value="IDR" <?= (!$edit || ($edit && $edit['mata_uang']=='IDR')) ? 'selected':'' ?>>IDR</option>
                                 <option value="USD" <?= ($edit && $edit['mata_uang']=='USD')?'selected':'' ?>>USD</option>
                             </select>
                         </div>
@@ -183,7 +185,7 @@ if (isset($_GET['edit'])) {
 </div>
 
 
-<?php if ($edit): ?>
+<?php if ($edit || $add): ?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     $('#modal-account').modal('show');
