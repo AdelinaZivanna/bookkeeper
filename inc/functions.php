@@ -510,10 +510,23 @@ function history_all($conn) {
     return mysqli_query($conn, $sql);
 }
 
+
 function getTotalSaldo($conn) {
-    $result = mysqli_query($conn, "SELECT SUM(saldoawal) AS total FROM akun");
-    $row = mysqli_fetch_assoc($result);
-    return (int)$row['total'];
+    $akun = akun_all();
+    $transaksi_kas = getAllKasKecil($conn);
+    
+    $total_pengeluaran = 0;
+    while ($transaksi = mysqli_fetch_assoc($transaksi_kas)) {
+        $total_pengeluaran += $transaksi['jumlah'];
+    }
+    
+    $total_saldo_awal = 0;
+    foreach ($akun as $a) {
+        $total_saldo_awal += $a['saldoawal'];
+    }
+    
+    $saldoakhir = $total_saldo_awal - $total_pengeluaran;
+    return (int)$saldoakhir;
 }
 
 
